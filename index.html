@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VahanVerify - Vehicle Info & History Portal</title>
+    <title>VahanVerify - Fast Vehicle Info Portal</title>
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -35,7 +35,6 @@
             touch-action: manipulation;
         }
 
-        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
         }
@@ -82,10 +81,10 @@
         <div class="max-w-6xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-lg shadow-lg shadow-blue-500/30">
-                    <i class="fa-solid fa-car-side"></i>
+                    <i class="fa-solid fa-bolt"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-base tracking-wide leading-none">VahanVerify</h1>
+                    <h1 class="font-bold text-base tracking-wide leading-none">VahanVerify <span class="text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded ml-1">FAST</span></h1>
                     <p class="text-[11px] text-slate-400 mt-1">Vehicle Info & History Portal</p>
                 </div>
             </div>
@@ -108,7 +107,7 @@
                 Enter Registration Number to Fetch Details
             </label>
             
-            <form id="searchForm" action="javascript:void(0);" onsubmit="handleSearch(event)" class="flex flex-col sm:flex-row gap-2">
+            <form id="searchForm" onsubmit="event.preventDefault(); handleSearch();" class="flex flex-col sm:flex-row gap-2">
                 <div class="relative flex-grow">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                         <i class="fa-solid fa-magnifying-glass text-sm"></i>
@@ -128,10 +127,11 @@
                 <button 
                     type="submit" 
                     id="searchBtn" 
-                    class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white text-sm font-bold rounded-lg transition-all shadow flex items-center justify-center gap-2 whitespace-nowrap active:scale-95"
+                    onclick="handleSearch();"
+                    class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white text-sm font-bold rounded-lg transition-all shadow flex items-center justify-center gap-2 whitespace-nowrap active:scale-95 cursor-pointer"
                 >
-                    <i id="btnIcon" class="fa-solid fa-magnifying-glass text-xs"></i>
-                    <span id="btnText">Search Vehicle</span>
+                    <i id="btnIcon" class="fa-solid fa-bolt text-xs"></i>
+                    <span id="btnText">Fast Search</span>
                 </button>
             </form>
             <p class="text-[11px] text-slate-400">Enter vehicle registration number with or without spaces/dashes.</p>
@@ -143,8 +143,8 @@
             <div class="inline-block relative w-12 h-12 mb-3">
                 <div class="w-12 h-12 rounded-full border-4 border-slate-200 border-t-blue-600 animate-spin"></div>
             </div>
-            <h3 class="text-sm font-bold text-slate-800">Fetching Vehicle Details...</h3>
-            <p class="text-xs text-slate-500 mt-1">MVAHAN Database se info synchronize ho rahi hai.</p>
+            <h3 class="text-sm font-bold text-slate-800">Fast Fetching Vehicle Details...</h3>
+            <p class="text-xs text-slate-500 mt-1">High-speed server se data fetch ho raha hai.</p>
         </div>
 
 
@@ -166,7 +166,6 @@
             <!-- TOP DARK BANNER -->
             <div class="dark-header-card rounded-xl p-5 sm:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-md relative overflow-hidden">
                 <div class="flex items-center gap-4 relative z-10">
-                    
                     <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 border border-blue-400/40 flex items-center justify-center text-white text-2xl shrink-0 vehicle-logo-glow">
                         <i id="vehicleLogoIcon" class="fa-solid fa-shield-halved"></i>
                     </div>
@@ -187,7 +186,7 @@
             </div>
 
 
-            <!-- GRID SECTION (STRICT NON-NULL DISPLAY) -->
+            <!-- GRID SECTION -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="detailsGrid">
                 
                 <!-- OWNER DETAILS CARD -->
@@ -256,7 +255,6 @@
             if (e.ctrlKey && ['u', 'U', 's', 'S'].includes(e.key)) e.preventDefault();
         });
 
-        // Mobile Auto Formatting Handler
         const vehicleInput = document.getElementById('vehicleInput');
         vehicleInput.addEventListener('input', function() {
             this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -264,23 +262,15 @@
 
         let isCooldownActive = false;
 
-        async function handleSearch(event) {
-            if (event) {
-                event.preventDefault();
-                event.stopPropagation();
-            }
-            
-            if (isCooldownActive) return false;
+        async function handleSearch() {
+            if (isCooldownActive) return;
 
-            // Soft Keypad Dismiss for Mobile Browsers
             if (document.activeElement) {
                 document.activeElement.blur();
             }
 
-            const rawValue = vehicleInput.value;
-            const regNo = rawValue.toUpperCase().replace(/[^A-Z0-9]/g, '').trim();
-
-            if (!regNo) return false;
+            const regNo = vehicleInput.value.toUpperCase().replace(/[^A-Z0-9]/g, '').trim();
+            if (!regNo) return;
 
             document.getElementById('errorState').classList.add('hidden');
             document.getElementById('resultContainer').classList.add('hidden');
@@ -291,42 +281,46 @@
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 15000);
 
-            // Cross-Platform API Endpoint URL Structure
-            const apiUrl = `https://hideme.eu.org/lookup?api=mvahan&key=mk-4px4ohkcxybb&number=${encodeURIComponent(regNo)}`;
+            const directUrl = `https://hideme.eu.org/lookup?api=mvahan&key=mk-4px4ohkcxybb&number=${encodeURIComponent(regNo)}`;
+            
+            // Ultra-Fast Parallel Multi-Proxy Strategy
+            const proxy1 = `https://api.allorigins.win/raw?url=${encodeURIComponent(directUrl)}`;
+            const proxy2 = `https://corsproxy.io/?${encodeURIComponent(directUrl)}`;
+
+            let data = null;
 
             try {
-                let response;
+                // Try Direct Call first with fast timeout
                 try {
-                    response = await fetch(apiUrl, { 
-                        method: 'GET',
-                        signal: controller.signal,
-                        mode: 'cors',
-                        headers: {
-                            'Accept': 'application/json, text/plain, */*'
-                        }
-                    });
-                } catch (firstErr) {
-                    // CORS / Proxy Fallback for Mobile WebKit Engine
-                    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`;
-                    response = await fetch(proxyUrl, {
-                        method: 'GET',
-                        signal: controller.signal
-                    });
+                    const res = await fetch(directUrl, { signal: controller.signal, cache: 'no-cache' });
+                    if (res.ok) data = await res.json();
+                } catch (e) {
+                    console.warn("Direct API route blocked/failed, switching to fast proxies...");
+                }
+
+                // Fast Proxy Failover 1
+                if (!data) {
+                    try {
+                        const res1 = await fetch(proxy1, { signal: controller.signal });
+                        if (res1.ok) data = await res1.json();
+                    } catch (e) {
+                        console.warn("Proxy 1 failed, switching to Proxy 2...");
+                    }
+                }
+
+                // Fast Proxy Failover 2
+                if (!data) {
+                    const res2 = await fetch(proxy2, { signal: controller.signal });
+                    if (res2.ok) data = await res2.json();
                 }
 
                 clearTimeout(timeoutId);
 
-                if (!response.ok) throw new Error("Network Response Error");
-
-                const data = await response.json();
-
                 if (data && (data.success === true || data.status === "success") && data.vehicle) {
                     renderVehicleData(data, regNo);
-                    
-                    // Smooth Auto-Scroll for Mobile View
                     setTimeout(() => {
                         document.getElementById('resultContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    }, 100);
+                    }, 50);
                 } else {
                     showError("Details not found. Please check the vehicle number or try again after 15 seconds.");
                 }
@@ -337,8 +331,6 @@
             } finally {
                 document.getElementById('loadingState').classList.add('hidden');
             }
-
-            return false;
         }
 
         function startCooldown(seconds) {
@@ -361,8 +353,8 @@
                     clearInterval(timer);
                     isCooldownActive = false;
                     btn.disabled = false;
-                    btnText.textContent = "Search Vehicle";
-                    btnIcon.className = "fa-solid fa-magnifying-glass text-xs";
+                    btnText.textContent = "Fast Search";
+                    btnIcon.className = "fa-solid fa-bolt text-xs";
                 }
             }, 1000);
         }
