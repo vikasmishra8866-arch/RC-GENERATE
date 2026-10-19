@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exact RC Card Dynamic Overlay Generator</title>
+    <!-- jsPDF Library for High-Precision Printing -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
+        body { background: #eef2f5; margin: 0; padding: 20px; }
+        .main-container { display: flex; gap: 20px; max-width: 1400px; margin: 0 auto; }
+        .form-section { flex: 1; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-height: 90vh; overflow-y: auto; }
+        .preview-section { flex: 1.2; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
+        h2 { margin-top: 0; color: #1e293b; font-size: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .full-width { grid-column: span 2; }
+        label { font-size: 12px; font-weight: 600; color: #475569; display: block; margin-bottom: 4px; }
+        input { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
+        input:focus { border-color: #2563eb; outline: none; }
+        .btn-group { margin-top: 20px; display: flex; gap: 10px; }
+        button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn-preview { background: #0284c7; color: #fff; }
+        .btn-pdf { background: #16a34a; color: #fff; }
+        button:hover { opacity: 0.9; }
+        canvas { max-width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+    </style>
+</head>
+<body>
+
+<div class="main-container">
+    <!-- Form Inputs Section -->
+    <div class="form-section">
+        <h2>RC Details Fillup</h2>
+        <div class="form-grid">
+            <div class="full-width">
+                <label>Blank RC Image / Template Upload</label>
+                <input type="file" id="bgImageInput" accept="image/*">
+            </div>
+
+            <div><label>Regn No</label><input type="text" id="regnNo" value="GJ05CX1400"></div>
+            <div><label>Date of Regn</label><input type="text" id="regnDate" value="20-Jan-2024"></div>
+            <div><label>Regn Validity</label><input type="text" id="regnValid" value="19-Jan-2026"></div>
+            <div><label>Owner Serial</label><input type="text" id="ownerSr" value="1"></div>
+            <div><label>Chassis No</label><input type="text" id="chassisNo" value="MCG51AADDA2405431"></div>
+            <div><label>Engine/Motor No</label><input type="text" id="engineNo" value="S3M9307924"></div>
+            <div><label>Owner Name</label><input type="text" id="ownerName" value="SACHIN"></div>
+            <div><label>Son/Daughter/Wife of</label><input type="text" id="swdOf" value="TIVENI PRASAD PANDEY"></div>
+            <div><label>Emission Norms</label><input type="text" id="norms" value="BHARAT STAGE VI"></div>
+            <div class="full-width"><label>Address</label><input type="text" id="address" value="PL NO 54, SHIV SAI NAGAR, NAVAGAM DINDOLI ROAD, NANDANVAN UDHNA SURAT,, Surat, Gujarat, 394210"></div>
+            
+            <div><label>Vehicle Class</label><input type="text" id="vClass" value="THREE WHEELER (GOODS) (3WT)"></div>
+            <div><label>Month-Year Mfg</label><input type="text" id="mfgDate" value="01/2024"></div>
+            <div><label>No of Cylinders</label><input type="text" id="cylinders" value="1"></div>
+            <div><label>Maker</label><input type="text" id="maker" value="ATUL AUTO LTD"></div>
+            <div><label>Model</label><input type="text" id="model" value="ATUL SHAKTI 435 CARGO XL (D)"></div>
+            <div><label>Color</label><input type="text" id="color" value="BLUE"></div>
+            <div><label>Body Type</label><input type="text" id="bodyType" value="OPEN BODY SHEET METAL"></div>
+            <div><label>Seating Cap</label><input type="text" id="seating" value="1"></div>
+            <div><label>Unladen/Laden Wt</label><input type="text" id="weight" value="480"></div>
+            <div><label>Cubic Cap (CC)</label><input type="text" id="cc" value="435"></div>
+            <div><label>BHP</label><input type="text" id="bhp" value="7.5 bph"></div>
+            <div><label>Wheel Base</label><input type="text" id="wheelbase" value="1960"></div>
+            <div><label>Fuel</label><input type="text" id="fuel" value="DIESEL"></div>
+            <div class="full-width"><label>Financier</label><input type="text" id="financier" value="IDFC FIRST BANK LTD."></div>
+            <div class="full-width"><label>Registration Authority</label><input type="text" id="rto" value="SURAT, Gujarat"></div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-preview" onclick="renderCanvas()">Generate Preview</button>
+            <button class="btn-pdf" onclick="generatePDF()">Download Exact PDF</button>
+        </div>
+    </div>
+
+    <!-- Live Card Canvas Preview -->
+    <div class="preview-section">
+        <h2>Live Exact Overlay Preview</h2>
+        <canvas id="rcCanvas" width="595" height="842"></canvas>
+    </div>
+</div>
+
+<script>
+    const canvas = document.getElementById('rcCanvas');
+    const ctx = canvas.getContext('2d');
+    let bgImage = null;
+
+    // Standard PDF A4 dimensions (595 x 842 Points)
+    const PAGE_HEIGHT = 842;
+
+    // Exact Coordinates Map (Converted to Canvas Top-Left Origin System)
+    function getCoordinatesMap() {
+        return {
+            fuel: { x: 35, y: PAGE_HEIGHT - 790, font: "bold 12px Arial" },
+            regnNo: { x: 35, y: PAGE_HEIGHT - 720, font: "bold 13px Arial" },
+            regnDate: { x: 150, y: PAGE_HEIGHT - 720, font: "12px Arial" },
+            regnValid: { x: 260, y: PAGE_HEIGHT - 720, font: "12px Arial" },
+            ownerSr: { x: 450, y: PAGE_HEIGHT - 735, font: "12px Arial" },
+            
+            chassisNo: { x: 35, y: PAGE_HEIGHT - 680, font: "12px Arial" },
+            engineNo: { x: 280, y: PAGE_HEIGHT - 680, font: "12px Arial" },
+            
+            ownerName: { x: 35, y: PAGE_HEIGHT - 640, font: "bold 12px Arial" },
+            swdOf: { x: 280, y: PAGE_HEIGHT - 640, font: "12px Arial" },
+            
+            norms: { x: 35, y: PAGE_HEIGHT - 600, font: "12px Arial" },
+            address: { x: 280, y: PAGE_HEIGHT - 595, font: "11px Arial", maxWidth: 280 },
+
+            regnNoSec: { x: 35, y: PAGE_HEIGHT - 495, font: "bold 12px Arial" },
+            vClass: { x: 220, y: PAGE_HEIGHT - 495, font: "12px Arial" },
+
+            mfgDate: { x: 35, y: PAGE_HEIGHT - 455, font: "12px Arial" },
+            cylinders: { x: 320, y: PAGE_HEIGHT - 470, font: "12px Arial" },
+
+            maker: { x: 35, y: PAGE_HEIGHT - 415, font: "12px Arial" },
+            model: { x: 220, y: PAGE_HEIGHT - 415, font: "12px Arial" },
+
+            colorBody: { x: 35, y: PAGE_HEIGHT - 375, font: "12px Arial" },
+            seating: { x: 420, y: PAGE_HEIGHT - 390, font: "12px Arial" },
+
+            weight: { x: 35, y: PAGE_HEIGHT - 335, font: "12px Arial" },
+            specsCombined: { x: 35, y: PAGE_HEIGHT - 295, font: "12px Arial" },
+
+            financier: { x: 35, y: PAGE_HEIGHT - 245, font: "12px Arial" },
+            rto: { x: 280, y: PAGE_HEIGHT - 245, font: "12px Arial" }
+        };
+    }
+
+    // Handle Background Image Upload
+    document.getElementById('bgImageInput').addEventListener('change', function(e) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            bgImage = new Image();
+            bgImage.onload = function() {
+                renderCanvas();
+            };
+            bgImage.src = event.target.result;
+        };
+        if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
+    });
+
+    // Render Data onto Canvas
+    function renderCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        // Draw Background Card Template if uploaded
+        if (bgImage) {
+            ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
+        } else {
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = "#94a3b8";
+            ctx.font = "14px Arial";
+            ctx.fillText("Upload Blank Card Template to see background", 150, 420);
+        }
+
+        ctx.fillStyle = "#000000"; // Text Color
+        const coords = getCoordinatesMap();
+
+        // Print All Values at Exact X, Y
+        drawText(document.getElementById('fuel').value, coords.fuel);
+        drawText(document.getElementById('regnNo').value, coords.regnNo);
+        drawText(document.getElementById('regnDate').value, coords.regnDate);
+        drawText(document.getElementById('regnValid').value, coords.regnValid);
+        drawText(document.getElementById('ownerSr').value, coords.ownerSr);
+
+        drawText(document.getElementById('chassisNo').value, coords.chassisNo);
+        drawText(document.getElementById('engineNo').value, coords.engineNo);
+
+        drawText(document.getElementById('ownerName').value, coords.ownerName);
+        drawText(document.getElementById('swdOf').value, coords.swdOf);
+
+        drawText(document.getElementById('norms').value, coords.norms);
+        drawText(document.getElementById('address').value, coords.address);
+
+        drawText(document.getElementById('regnNo').value, coords.regnNoSec);
+        drawText(document.getElementById('vClass').value, coords.vClass);
+
+        drawText(document.getElementById('mfgDate').value, coords.mfgDate);
+        drawText(document.getElementById('cylinders').value, coords.cylinders);
+
+        drawText(document.getElementById('maker').value, coords.maker);
+        drawText(document.getElementById('model').value, coords.model);
+
+        const colorBodyVal = `${document.getElementById('color').value} / ${document.getElementById('bodyType').value}`;
+        drawText(colorBodyVal, coords.colorBody);
+        drawText(document.getElementById('seating').value, coords.seating);
+
+        drawText(document.getElementById('weight').value, coords.weight);
+
+        const specsVal = `${document.getElementById('cc').value} / ${document.getElementById('bhp').value} / ${document.getElementById('wheelbase').value}`;
+        drawText(specsVal, coords.specsCombined);
+
+        drawText(document.getElementById('financier').value, coords.financier);
+        drawText(document.getElementById('rto').value, coords.rto);
+    }
+
+    function drawText(text, config) {
+        if (!text) return;
+        ctx.font = config.font || "12px Arial";
+        if (config.maxWidth) {
+            wrapText(ctx, text, config.x, config.y, config.maxWidth, 14);
+        } else {
+            ctx.fillText(text, config.x, config.y);
+        }
+    }
+
+    // Auto Multi-line Wrapper for Address
+    function wrapText(context, text, x, y, maxWidth, lineHeight) {
+        let words = text.split(' ');
+        let line = '';
+
+        for(let n = 0; n < words.length; n++) {
+            let testLine = line + words[n] + ' ';
+            let metrics = context.measureText(testLine);
+            let testWidth = metrics.width;
+            if (testWidth > maxWidth && n > 0) {
+                context.fillText(line, x, y);
+                line = words[n] + ' ';
+                y += lineHeight;
+            } else {
+                line = testLine;
+            }
+        }
+        context.fillText(line, x, y);
+    }
+
+    // Generate PDF at Exact Vector Coordinates
+    function generatePDF() {
+        const { jsPDF } = window.jspdf;
+        const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'pt',
+            format: [595, 842]
+        });
+
+        const imgData = canvas.toDataURL('image/png', 1.0);
+        pdf.addImage(imgData, 'PNG', 0, 0, 595, 842, undefined, 'NONE');
+        pdf.save('RC_Filled_Card.pdf');
+    }
+
+    // Initial Preview Load
+    window.onload = renderCanvas;
+</script>
+
+</body>
+</html>
