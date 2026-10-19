@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VahanVerify - Vehicle Info & History Portal</title>
     
     <!-- Tailwind CSS CDN -->
@@ -32,6 +32,7 @@
             font-family: 'Inter', sans-serif;
             user-select: none;
             -webkit-user-select: none;
+            touch-action: manipulation;
         }
 
         /* Custom Scrollbar */
@@ -107,7 +108,7 @@
                 Enter Registration Number to Fetch Details
             </label>
             
-            <form id="searchForm" onsubmit="handleSearch(event)" class="flex flex-col sm:flex-row gap-2">
+            <form id="searchForm" action="javascript:void(0);" onsubmit="handleSearch(event)" class="flex flex-col sm:flex-row gap-2">
                 <div class="relative flex-grow">
                     <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
                         <i class="fa-solid fa-magnifying-glass text-sm"></i>
@@ -127,7 +128,7 @@
                 <button 
                     type="submit" 
                     id="searchBtn" 
-                    class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white text-sm font-bold rounded-lg transition-all shadow flex items-center justify-center gap-2 whitespace-nowrap"
+                    class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-slate-400 text-white text-sm font-bold rounded-lg transition-all shadow flex items-center justify-center gap-2 whitespace-nowrap active:scale-95"
                 >
                     <i id="btnIcon" class="fa-solid fa-magnifying-glass text-xs"></i>
                     <span id="btnText">Search Vehicle</span>
@@ -210,276 +211,4 @@
                     <div class="flex items-center gap-2 pb-2 border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
                         <i class="fa-solid fa-file-shield text-blue-600"></i> RC & Compliance
                     </div>
-                    <div class="space-y-2.5" id="listRc"></div>
-                </div>
-
-                <!-- ADDRESS DETAILS CARD -->
-                <div id="cardAddress" class="hidden info-card rounded-xl p-4 space-y-2 md:col-span-2">
-                    <div class="flex items-center gap-2 pb-2 border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        <i class="fa-solid fa-location-dot text-blue-600"></i> Address Details
-                    </div>
-                    <p id="valAddress" class="text-xs font-semibold text-slate-700 leading-relaxed pt-1">--</p>
-                </div>
-
-                <!-- INSURANCE INFO CARD -->
-                <div id="cardInsurance" class="hidden info-card rounded-xl p-4 space-y-3">
-                    <div class="flex items-center gap-2 pb-2 border-b border-slate-100 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        <i class="fa-solid fa-building-shield text-blue-600"></i> Insurance Info
-                    </div>
-                    <div class="space-y-2.5" id="listInsurance"></div>
-                </div>
-
-            </div>
-
-        </div>
-
-    </main>
-
-
-    <!-- FOOTER -->
-    <footer class="w-full bg-white border-t border-slate-200 py-4 px-6 text-xs text-slate-500 mt-8">
-        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div id="footerBadges" class="flex flex-wrap gap-2 font-mono text-[11px]"></div>
-            <p>&copy; 2026 VahanVerify. Vehicle information sourced securely.</p>
-        </div>
-    </footer>
-
-
-    <!-- JAVASCRIPT LOGIC WITH MOBILE FIX -->
-    <script>
-        // Security Protections
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('keydown', e => {
-            if (e.key === 'F12') e.preventDefault();
-            if (e.ctrlKey && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c'].includes(e.key)) e.preventDefault();
-            if (e.ctrlKey && ['u', 'U', 's', 'S'].includes(e.key)) e.preventDefault();
-        });
-
-        // Mobile Auto Formatting Handler (Fixes Mobile Input Noise)
-        const vehicleInput = document.getElementById('vehicleInput');
-        vehicleInput.addEventListener('input', function() {
-            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-        });
-
-        let isCooldownActive = false;
-
-        async function handleSearch(event) {
-            event.preventDefault();
-            if (isCooldownActive) return;
-
-            // Strict Clean Sanitizer for Mobile Keyboards
-            const rawValue = vehicleInput.value;
-            const regNo = rawValue.toUpperCase().replace(/[^A-Z0-9]/g, '').trim();
-
-            if (!regNo) return;
-
-            document.getElementById('errorState').classList.add('hidden');
-            document.getElementById('resultContainer').classList.add('hidden');
-            document.getElementById('loadingState').classList.remove('hidden');
-
-            startCooldown(7);
-
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 Seconds timeout
-
-            const apiUrl = `https://hideme.eu.org/lookup?api=mvahan&key=mk-4px4ohkcxybb&number=${encodeURIComponent(regNo)}`;
-
-            try {
-                const response = await fetch(apiUrl, { 
-                    method: 'GET',
-                    signal: controller.signal,
-                    cache: 'no-cache',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                clearTimeout(timeoutId);
-
-                if (!response.ok) throw new Error("Network Error");
-
-                const data = await response.json();
-
-                if (data && data.success === true && data.vehicle) {
-                    renderVehicleData(data, regNo);
-                } else {
-                    showError("Details not found. Please check the vehicle number or try again after 15 seconds.");
-                }
-
-            } catch (err) {
-                clearTimeout(timeoutId);
-                showError("Details not found. Please check the vehicle number or try again after 15 seconds.");
-            } finally {
-                document.getElementById('loadingState').classList.add('hidden');
-            }
-        }
-
-        function startCooldown(seconds) {
-            isCooldownActive = true;
-            const btn = document.getElementById('searchBtn');
-            const btnText = document.getElementById('btnText');
-            const btnIcon = document.getElementById('btnIcon');
-
-            btn.disabled = true;
-            btnIcon.className = "fa-solid fa-clock text-xs animate-spin";
-
-            let timeLeft = seconds;
-            btnText.textContent = `Wait ${timeLeft}s...`;
-
-            const timer = setInterval(() => {
-                timeLeft--;
-                if (timeLeft > 0) {
-                    btnText.textContent = `Wait ${timeLeft}s...`;
-                } else {
-                    clearInterval(timer);
-                    isCooldownActive = false;
-                    btn.disabled = false;
-                    btnText.textContent = "Search Vehicle";
-                    btnIcon.className = "fa-solid fa-magnifying-glass text-xs";
-                }
-            }, 1000);
-        }
-
-        function showError(msg) {
-            document.getElementById('errorMessageText').textContent = msg;
-            document.getElementById('errorState').classList.remove('hidden');
-        }
-
-        function isValid(val) {
-            return val !== null && 
-                   val !== undefined && 
-                   val.toString().trim() !== '' && 
-                   val.toString().trim().toLowerCase() !== 'null';
-        }
-
-        function renderVehicleData(rootData, inputRegNo) {
-            const v = rootData.vehicle || {};
-
-            // Dynamic Vehicle Logo Icon Update based on Category / Body Type
-            const logoIcon = document.getElementById('vehicleLogoIcon');
-            const cat = (v.vehicle_category || v.body_type || v.vehicle_class || '').toLowerCase();
-            
-            if (cat.includes('scooter') || cat.includes('two') || cat.includes('2w') || cat.includes('bike')) {
-                logoIcon.className = "fa-solid fa-motorcycle";
-            } else if (cat.includes('three') || cat.includes('3w') || cat.includes('rickshaw')) {
-                logoIcon.className = "fa-solid fa-truck-pickup";
-            } else if (cat.includes('bus') || cat.includes('truck')) {
-                logoIcon.className = "fa-solid fa-bus";
-            } else {
-                logoIcon.className = "fa-solid fa-car-side";
-            }
-
-            // Top Header Banner
-            document.getElementById('resRegNo').textContent = v.registration_no || rootData.reg_no || inputRegNo;
-            
-            const fullModel = [v.make, v.model, v.variant].filter(isValid).join(' ');
-            document.getElementById('resModel').textContent = fullModel || 'Vehicle Details';
-
-            const statusEl = document.getElementById('resStatus');
-            statusEl.textContent = isValid(v.status) ? v.status.toUpperCase() : 'ACTIVE';
-
-            // Top Fuel & Norms Badges
-            const fuelEl = document.getElementById('resFuel');
-            if (isValid(v.fuel)) {
-                fuelEl.textContent = `Fuel: ${v.fuel.toUpperCase()}`;
-                fuelEl.classList.remove('hidden');
-            } else { fuelEl.classList.add('hidden'); }
-
-            const normsEl = document.getElementById('resNorms');
-            if (isValid(v.norms)) {
-                normsEl.textContent = `Norms: ${v.norms}`;
-                normsEl.classList.remove('hidden');
-            } else { normsEl.classList.add('hidden'); }
-
-            // 1. OWNER DETAILS
-            const ownerItems = [
-                { label: 'Full Name', val: v.owner },
-                { label: 'Mobile Number', val: rootData.mobile, isMobile: true },
-                { label: 'Father\'s Name', val: v.father_name },
-                { label: 'City', val: v.city }
-            ];
-            renderCardList('cardOwner', 'listOwner', ownerItems);
-
-            // 2. TECHNICAL SPECS
-            const specItems = [
-                { label: 'Chassis No', val: v.chassis },
-                { label: 'Chassis (Last 5)', val: rootData.chassis_last5 },
-                { label: 'Engine No', val: v.engine },
-                { label: 'Vehicle Class', val: v.vehicle_class },
-                { label: 'Body Type', val: v.body_type },
-                { label: 'Color', val: v.color },
-                { label: 'Cubic Capacity (CC)', val: v.cubic_capacity },
-                { label: 'Seating Capacity', val: v.seating_capacity }
-            ];
-            renderCardList('cardSpecs', 'listSpecs', specItems);
-
-            // 3. RC & COMPLIANCE
-            const rcItems = [
-                { label: 'Reg Authority (RTO)', val: v.rto },
-                { label: 'Registration Date', val: v.registration_date },
-                { label: 'RC Valid Upto', val: v.fit_upto },
-                { label: 'PUCC Expiry', val: v.puc_upto },
-                { label: 'Tax Valid Upto', val: v.tax_upto },
-                { label: 'Financier', val: v.financier }
-            ];
-            renderCardList('cardRc', 'listRc', rcItems);
-
-            // 4. ADDRESS CARD
-            const addrCard = document.getElementById('cardAddress');
-            if (isValid(v.address)) {
-                document.getElementById('valAddress').textContent = v.address;
-                addrCard.classList.remove('hidden');
-            } else {
-                addrCard.classList.add('hidden');
-            }
-
-            // 5. INSURANCE INFO
-            const insItems = [
-                { label: 'Insurer', val: v.insurance_company },
-                { label: 'Policy No', val: v.insurance_policy_no },
-                { label: 'Policy Expiry', val: v.insurance_upto }
-            ];
-            renderCardList('cardInsurance', 'listInsurance', insItems);
-
-            // FOOTER BADGES
-            const footerBadges = document.getElementById('footerBadges');
-            footerBadges.innerHTML = '';
-            const metaList = [
-                { label: 'Source', val: v.source },
-                { label: 'Key Expiry', val: rootData.key_expiry },
-                { label: 'Dev', val: rootData.developer },
-                { label: 'Credits', val: rootData.credits }
-            ];
-            metaList.forEach(m => {
-                if (isValid(m.val)) {
-                    footerBadges.innerHTML += `<span class="bg-slate-100 border border-slate-200 px-2 py-0.5 rounded text-slate-600">${m.label}: ${m.val}</span>`;
-                }
-            });
-
-            document.getElementById('resultContainer').classList.remove('hidden');
-        }
-
-        function renderCardList(cardId, listId, items) {
-            const card = document.getElementById(cardId);
-            const list = document.getElementById(listId);
-            list.innerHTML = '';
-
-            const validItems = items.filter(item => isValid(item.val));
-
-            if (validItems.length > 0) {
-                validItems.forEach(item => {
-                    const mobileClass = item.isMobile ? 'text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200' : 'text-slate-800';
-                    list.innerHTML += `
-                        <div class="flex justify-between items-center text-xs gap-2">
-                            <span class="key-label">${item.label}</span>
-                            <span class="val-text font-mono ${mobileClass} text-right truncate">${item.val}</span>
-                        </div>
-                    `;
-                });
-                card.classList.remove('hidden');
-            } else {
-                card.classList.add('hidden');
-            }
-        }
-    </script>
-</body>
-</html>
+                    <div class
