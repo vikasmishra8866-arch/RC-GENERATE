@@ -47,7 +47,7 @@
         }
 
         .dark-header-card {
-            background: #0f172a;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: #ffffff;
         }
 
@@ -68,6 +68,11 @@
             font-size: 0.825rem;
             font-weight: 700;
         }
+
+        /* Premium Logo Glow */
+        .vehicle-logo-glow {
+            box-shadow: 0 0 20px -3px rgba(37, 99, 235, 0.5);
+        }
     </style>
 </head>
 <body class="min-h-screen flex flex-col justify-between">
@@ -76,8 +81,9 @@
     <header class="w-full bg-[#0b132b] text-white py-4 px-6 border-b border-slate-800 sticky top-0 z-40">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white text-base">
-                    <i class="fa-solid fa-shield-halved"></i>
+                <!-- Main Header Logo -->
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-lg shadow-lg shadow-blue-500/30">
+                    <i class="fa-solid fa-car-side"></i>
                 </div>
                 <div>
                     <h1 class="font-bold text-base tracking-wide leading-none">VahanVerify</h1>
@@ -155,12 +161,15 @@
         <!-- RESULTS CONTAINER -->
         <div id="resultContainer" class="hidden space-y-4">
             
-            <!-- TOP DARK BANNER -->
-            <div class="dark-header-card rounded-xl p-5 sm:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-md">
-                <div class="flex items-center gap-4">
-                    <div class="w-12 h-12 rounded-lg bg-blue-600/30 border border-blue-500/40 flex items-center justify-center text-blue-400 text-xl shrink-0">
-                        <i class="fa-solid fa-motorcycle" id="vehicleIcon"></i>
+            <!-- TOP DARK BANNER WITH NEW VEHICLE LOGO -->
+            <div class="dark-header-card rounded-xl p-5 sm:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-md relative overflow-hidden">
+                <div class="flex items-center gap-4 relative z-10">
+                    
+                    <!-- NEW PREMIUM DYNAMIC VEHICLE LOGO -->
+                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 border border-blue-400/40 flex items-center justify-center text-white text-2xl shrink-0 vehicle-logo-glow">
+                        <i id="vehicleLogoIcon" class="fa-solid fa-shield-halved"></i>
                     </div>
+
                     <div>
                         <div class="flex items-center gap-2 mb-1">
                             <span id="resRegNo" class="font-mono text-xl sm:text-2xl font-extrabold tracking-wide">--</span>
@@ -170,9 +179,9 @@
                     </div>
                 </div>
 
-                <div class="flex flex-wrap items-center gap-2 text-xs font-mono">
-                    <span id="resFuel" class="hidden px-3 py-1 rounded bg-slate-800 text-slate-200 border border-slate-700">--</span>
-                    <span id="resNorms" class="hidden px-3 py-1 rounded bg-slate-800 text-slate-200 border border-slate-700">--</span>
+                <div class="flex flex-wrap items-center gap-2 text-xs font-mono relative z-10">
+                    <span id="resFuel" class="hidden px-3 py-1 rounded bg-slate-800/90 text-slate-200 border border-slate-700">--</span>
+                    <span id="resNorms" class="hidden px-3 py-1 rounded bg-slate-800/90 text-slate-200 border border-slate-700">--</span>
                 </div>
             </div>
 
@@ -321,7 +330,6 @@
             document.getElementById('errorState').classList.remove('hidden');
         }
 
-        // Helper function to check non-null & valid string
         function isValid(val) {
             return val !== null && 
                    val !== undefined && 
@@ -331,6 +339,20 @@
 
         function renderVehicleData(rootData, inputRegNo) {
             const v = rootData.vehicle || {};
+
+            // Dynamic Vehicle Logo Icon Update based on Category / Body Type
+            const logoIcon = document.getElementById('vehicleLogoIcon');
+            const cat = (v.vehicle_category || v.body_type || v.vehicle_class || '').toLowerCase();
+            
+            if (cat.includes('scooter') || cat.includes('two') || cat.includes('2w') || cat.includes('bike')) {
+                logoIcon.className = "fa-solid fa-motorcycle";
+            } else if (cat.includes('three') || cat.includes('3w') || cat.includes('rickshaw')) {
+                logoIcon.className = "fa-solid fa-truck-pickup";
+            } else if (cat.includes('bus') || cat.includes('truck')) {
+                logoIcon.className = "fa-solid fa-bus";
+            } else {
+                logoIcon.className = "fa-solid fa-car-side";
+            }
 
             // Top Header Banner
             document.getElementById('resRegNo').textContent = v.registration_no || rootData.reg_no || inputRegNo;
@@ -422,7 +444,6 @@
             document.getElementById('resultContainer').classList.remove('hidden');
         }
 
-        // Helper to render key-value lists inside cards (Hides Nulls completely)
         function renderCardList(cardId, listId, items) {
             const card = document.getElementById(cardId);
             const list = document.getElementById(listId);
