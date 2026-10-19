@@ -69,7 +69,6 @@
             font-weight: 700;
         }
 
-        /* Premium Logo Glow */
         .vehicle-logo-glow {
             box-shadow: 0 0 20px -3px rgba(37, 99, 235, 0.5);
         }
@@ -81,7 +80,6 @@
     <header class="w-full bg-[#0b132b] text-white py-4 px-6 border-b border-slate-800 sticky top-0 z-40">
         <div class="max-w-6xl mx-auto flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <!-- Main Header Logo -->
                 <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-lg shadow-lg shadow-blue-500/30">
                     <i class="fa-solid fa-car-side"></i>
                 </div>
@@ -121,6 +119,9 @@
                         placeholder="DL4SDH5925, GJ05MS9717" 
                         required
                         autocomplete="off"
+                        autocorrect="off"
+                        autocapitalize="characters"
+                        spellcheck="false"
                     >
                 </div>
                 <button 
@@ -161,11 +162,10 @@
         <!-- RESULTS CONTAINER -->
         <div id="resultContainer" class="hidden space-y-4">
             
-            <!-- TOP DARK BANNER WITH NEW VEHICLE LOGO -->
+            <!-- TOP DARK BANNER -->
             <div class="dark-header-card rounded-xl p-5 sm:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-md relative overflow-hidden">
                 <div class="flex items-center gap-4 relative z-10">
                     
-                    <!-- NEW PREMIUM DYNAMIC VEHICLE LOGO -->
                     <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 border border-blue-400/40 flex items-center justify-center text-white text-2xl shrink-0 vehicle-logo-glow">
                         <i id="vehicleLogoIcon" class="fa-solid fa-shield-halved"></i>
                     </div>
@@ -245,7 +245,7 @@
     </footer>
 
 
-    <!-- JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC WITH MOBILE FIX -->
     <script>
         // Security Protections
         document.addEventListener('contextmenu', e => e.preventDefault());
@@ -255,14 +255,21 @@
             if (e.ctrlKey && ['u', 'U', 's', 'S'].includes(e.key)) e.preventDefault();
         });
 
+        // Mobile Auto Formatting Handler (Fixes Mobile Input Noise)
+        const vehicleInput = document.getElementById('vehicleInput');
+        vehicleInput.addEventListener('input', function() {
+            this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+        });
+
         let isCooldownActive = false;
 
         async function handleSearch(event) {
             event.preventDefault();
             if (isCooldownActive) return;
 
-            const inputField = document.getElementById('vehicleInput');
-            const regNo = inputField.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+            // Strict Clean Sanitizer for Mobile Keyboards
+            const rawValue = vehicleInput.value;
+            const regNo = rawValue.toUpperCase().replace(/[^A-Z0-9]/g, '').trim();
 
             if (!regNo) return;
 
@@ -275,10 +282,17 @@
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 Seconds timeout
 
-            const apiUrl = `https://hideme.eu.org/lookup?api=mvahan&key=mk-4px4ohkcxybb&number=${regNo}`;
+            const apiUrl = `https://hideme.eu.org/lookup?api=mvahan&key=mk-4px4ohkcxybb&number=${encodeURIComponent(regNo)}`;
 
             try {
-                const response = await fetch(apiUrl, { signal: controller.signal });
+                const response = await fetch(apiUrl, { 
+                    method: 'GET',
+                    signal: controller.signal,
+                    cache: 'no-cache',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
                 clearTimeout(timeoutId);
 
                 if (!response.ok) throw new Error("Network Error");
