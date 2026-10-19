@@ -1,246 +1,522 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Exact RC Card Dynamic Overlay Generator</title>
-    <!-- jsPDF Library for High-Precision Printing -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <style>
-        * { box-sizing: border-box; font-family: 'Segoe UI', Arial, sans-serif; }
-        body { background: #eef2f5; margin: 0; padding: 20px; }
-        .main-container { display: flex; gap: 20px; max-width: 1400px; margin: 0 auto; }
-        .form-section { flex: 1; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); max-height: 90vh; overflow-y: auto; }
-        .preview-section { flex: 1.2; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); text-align: center; }
-        h2 { margin-top: 0; color: #1e293b; font-size: 20px; border-bottom: 2px solid #e2e8f0; padding-bottom: 10px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .full-width { grid-column: span 2; }
-        label { font-size: 12px; font-weight: 600; color: #475569; display: block; margin-bottom: 4px; }
-        input { width: 100%; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 13px; }
-        input:focus { border-color: #2563eb; outline: none; }
-        .btn-group { margin-top: 20px; display: flex; gap: 10px; }
-        button { flex: 1; padding: 12px; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn-preview { background: #0284c7; color: #fff; }
-        .btn-pdf { background: #16a34a; color: #fff; }
-        button:hover { opacity: 0.9; }
-        canvas { max-width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-    </style>
-</head>
-<body>
-
-<div class="main-container">
-    <!-- Form Inputs Section -->
-    <div class="form-section">
-        <h2>RC Details Fillup</h2>
-        <div class="form-grid">
-            <div class="full-width">
-                <label>Blank RC Image / Template Upload</label>
-                <input type="file" id="bgImageInput" accept="image/*">
-            </div>
-
-            <div><label>Regn No</label><input type="text" id="regnNo" value="GJ05CX1400"></div>
-            <div><label>Date of Regn</label><input type="text" id="regnDate" value="20-Jan-2024"></div>
-            <div><label>Regn Validity</label><input type="text" id="regnValid" value="19-Jan-2026"></div>
-            <div><label>Owner Serial</label><input type="text" id="ownerSr" value="1"></div>
-            <div><label>Chassis No</label><input type="text" id="chassisNo" value="MCG51AADDA2405431"></div>
-            <div><label>Engine/Motor No</label><input type="text" id="engineNo" value="S3M9307924"></div>
-            <div><label>Owner Name</label><input type="text" id="ownerName" value="SACHIN"></div>
-            <div><label>Son/Daughter/Wife of</label><input type="text" id="swdOf" value="TIVENI PRASAD PANDEY"></div>
-            <div><label>Emission Norms</label><input type="text" id="norms" value="BHARAT STAGE VI"></div>
-            <div class="full-width"><label>Address</label><input type="text" id="address" value="PL NO 54, SHIV SAI NAGAR, NAVAGAM DINDOLI ROAD, NANDANVAN UDHNA SURAT,, Surat, Gujarat, 394210"></div>
-            
-            <div><label>Vehicle Class</label><input type="text" id="vClass" value="THREE WHEELER (GOODS) (3WT)"></div>
-            <div><label>Month-Year Mfg</label><input type="text" id="mfgDate" value="01/2024"></div>
-            <div><label>No of Cylinders</label><input type="text" id="cylinders" value="1"></div>
-            <div><label>Maker</label><input type="text" id="maker" value="ATUL AUTO LTD"></div>
-            <div><label>Model</label><input type="text" id="model" value="ATUL SHAKTI 435 CARGO XL (D)"></div>
-            <div><label>Color</label><input type="text" id="color" value="BLUE"></div>
-            <div><label>Body Type</label><input type="text" id="bodyType" value="OPEN BODY SHEET METAL"></div>
-            <div><label>Seating Cap</label><input type="text" id="seating" value="1"></div>
-            <div><label>Unladen/Laden Wt</label><input type="text" id="weight" value="480"></div>
-            <div><label>Cubic Cap (CC)</label><input type="text" id="cc" value="435"></div>
-            <div><label>BHP</label><input type="text" id="bhp" value="7.5 bph"></div>
-            <div><label>Wheel Base</label><input type="text" id="wheelbase" value="1960"></div>
-            <div><label>Fuel</label><input type="text" id="fuel" value="DIESEL"></div>
-            <div class="full-width"><label>Financier</label><input type="text" id="financier" value="IDFC FIRST BANK LTD."></div>
-            <div class="full-width"><label>Registration Authority</label><input type="text" id="rto" value="SURAT, Gujarat"></div>
-        </div>
-
-        <div class="btn-group">
-            <button class="btn-preview" onclick="renderCanvas()">Generate Preview</button>
-            <button class="btn-pdf" onclick="generatePDF()">Download Exact PDF</button>
-        </div>
-    </div>
-
-    <!-- Live Card Canvas Preview -->
-    <div class="preview-section">
-        <h2>Live Exact Overlay Preview</h2>
-        <canvas id="rcCanvas" width="595" height="842"></canvas>
-    </div>
-</div>
-
-<script>
-    const canvas = document.getElementById('rcCanvas');
-    const ctx = canvas.getContext('2d');
-    let bgImage = null;
-
-    // Standard PDF A4 dimensions (595 x 842 Points)
-    const PAGE_HEIGHT = 842;
-
-    // Exact Coordinates Map (Converted to Canvas Top-Left Origin System)
-    function getCoordinatesMap() {
-        return {
-            fuel: { x: 35, y: PAGE_HEIGHT - 790, font: "bold 12px Arial" },
-            regnNo: { x: 35, y: PAGE_HEIGHT - 720, font: "bold 13px Arial" },
-            regnDate: { x: 150, y: PAGE_HEIGHT - 720, font: "12px Arial" },
-            regnValid: { x: 260, y: PAGE_HEIGHT - 720, font: "12px Arial" },
-            ownerSr: { x: 450, y: PAGE_HEIGHT - 735, font: "12px Arial" },
-            
-            chassisNo: { x: 35, y: PAGE_HEIGHT - 680, font: "12px Arial" },
-            engineNo: { x: 280, y: PAGE_HEIGHT - 680, font: "12px Arial" },
-            
-            ownerName: { x: 35, y: PAGE_HEIGHT - 640, font: "bold 12px Arial" },
-            swdOf: { x: 280, y: PAGE_HEIGHT - 640, font: "12px Arial" },
-            
-            norms: { x: 35, y: PAGE_HEIGHT - 600, font: "12px Arial" },
-            address: { x: 280, y: PAGE_HEIGHT - 595, font: "11px Arial", maxWidth: 280 },
-
-            regnNoSec: { x: 35, y: PAGE_HEIGHT - 495, font: "bold 12px Arial" },
-            vClass: { x: 220, y: PAGE_HEIGHT - 495, font: "12px Arial" },
-
-            mfgDate: { x: 35, y: PAGE_HEIGHT - 455, font: "12px Arial" },
-            cylinders: { x: 320, y: PAGE_HEIGHT - 470, font: "12px Arial" },
-
-            maker: { x: 35, y: PAGE_HEIGHT - 415, font: "12px Arial" },
-            model: { x: 220, y: PAGE_HEIGHT - 415, font: "12px Arial" },
-
-            colorBody: { x: 35, y: PAGE_HEIGHT - 375, font: "12px Arial" },
-            seating: { x: 420, y: PAGE_HEIGHT - 390, font: "12px Arial" },
-
-            weight: { x: 35, y: PAGE_HEIGHT - 335, font: "12px Arial" },
-            specsCombined: { x: 35, y: PAGE_HEIGHT - 295, font: "12px Arial" },
-
-            financier: { x: 35, y: PAGE_HEIGHT - 245, font: "12px Arial" },
-            rto: { x: 280, y: PAGE_HEIGHT - 245, font: "12px Arial" }
-        };
-    }
-
-    // Handle Background Image Upload
-    document.getElementById('bgImageInput').addEventListener('change', function(e) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            bgImage = new Image();
-            bgImage.onload = function() {
-                renderCanvas();
-            };
-            bgImage.src = event.target.result;
-        };
-        if(e.target.files[0]) reader.readAsDataURL(e.target.files[0]);
-    });
-
-    // Render Data onto Canvas
-    function renderCanvas() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-        // Draw Background Card Template if uploaded
-        if (bgImage) {
-            ctx.drawImage(bgImage, 0, 0, canvas.width, canvas.height);
-        } else {
-            ctx.fillStyle = "#ffffff";
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-            ctx.fillStyle = "#94a3b8";
-            ctx.font = "14px Arial";
-            ctx.fillText("Upload Blank Card Template to see background", 150, 420);
-        }
-
-        ctx.fillStyle = "#000000"; // Text Color
-        const coords = getCoordinatesMap();
-
-        // Print All Values at Exact X, Y
-        drawText(document.getElementById('fuel').value, coords.fuel);
-        drawText(document.getElementById('regnNo').value, coords.regnNo);
-        drawText(document.getElementById('regnDate').value, coords.regnDate);
-        drawText(document.getElementById('regnValid').value, coords.regnValid);
-        drawText(document.getElementById('ownerSr').value, coords.ownerSr);
-
-        drawText(document.getElementById('chassisNo').value, coords.chassisNo);
-        drawText(document.getElementById('engineNo').value, coords.engineNo);
-
-        drawText(document.getElementById('ownerName').value, coords.ownerName);
-        drawText(document.getElementById('swdOf').value, coords.swdOf);
-
-        drawText(document.getElementById('norms').value, coords.norms);
-        drawText(document.getElementById('address').value, coords.address);
-
-        drawText(document.getElementById('regnNo').value, coords.regnNoSec);
-        drawText(document.getElementById('vClass').value, coords.vClass);
-
-        drawText(document.getElementById('mfgDate').value, coords.mfgDate);
-        drawText(document.getElementById('cylinders').value, coords.cylinders);
-
-        drawText(document.getElementById('maker').value, coords.maker);
-        drawText(document.getElementById('model').value, coords.model);
-
-        const colorBodyVal = `${document.getElementById('color').value} / ${document.getElementById('bodyType').value}`;
-        drawText(colorBodyVal, coords.colorBody);
-        drawText(document.getElementById('seating').value, coords.seating);
-
-        drawText(document.getElementById('weight').value, coords.weight);
-
-        const specsVal = `${document.getElementById('cc').value} / ${document.getElementById('bhp').value} / ${document.getElementById('wheelbase').value}`;
-        drawText(specsVal, coords.specsCombined);
-
-        drawText(document.getElementById('financier').value, coords.financier);
-        drawText(document.getElementById('rto').value, coords.rto);
-    }
-
-    function drawText(text, config) {
-        if (!text) return;
-        ctx.font = config.font || "12px Arial";
-        if (config.maxWidth) {
-            wrapText(ctx, text, config.x, config.y, config.maxWidth, 14);
-        } else {
-            ctx.fillText(text, config.x, config.y);
-        }
-    }
-
-    // Auto Multi-line Wrapper for Address
-    function wrapText(context, text, x, y, maxWidth, lineHeight) {
-        let words = text.split(' ');
-        let line = '';
-
-        for(let n = 0; n < words.length; n++) {
-            let testLine = line + words[n] + ' ';
-            let metrics = context.measureText(testLine);
-            let testWidth = metrics.width;
-            if (testWidth > maxWidth && n > 0) {
-                context.fillText(line, x, y);
-                line = words[n] + ' ';
-                y += lineHeight;
-            } else {
-                line = testLine;
+    <title>Vehicle Info Portal | Managed by Vikas Mishra</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        cyber: {
+                            bg: '#090d16',
+                            card: '#111827',
+                            border: '#1f2937',
+                            accent: '#3b82f6',
+                            glow: '#60a5fa',
+                        }
+                    }
+                }
             }
         }
-        context.fillText(line, x, y);
-    }
+    </script>
 
-    // Generate PDF at Exact Vector Coordinates
-    function generatePDF() {
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({
-            orientation: 'portrait',
-            unit: 'pt',
-            format: [595, 842]
+    <style>
+        body {
+            background-color: #060911;
+            color: #f3f4f6;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #090d16;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f2937;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #374151;
+        }
+
+        /* Glassmorphism Styles */
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .glass-modal {
+            background: rgba(10, 15, 26, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 50px -12px rgba(59, 130, 246, 0.25);
+        }
+
+        /* Animations */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-10px); }
+            40%, 80% { transform: translateX(10px); }
+        }
+
+        .animate-shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+
+        .glowing-badge {
+            box-shadow: 0 0 15px -3px rgba(59, 130, 246, 0.4);
+        }
+
+        .pulse-dot {
+            box-shadow: 0 0 8px #3b82f6;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden relative">
+
+    <!-- 1. SECURITY LOCK SYSTEM (PIN SCREEN MODAL) -->
+    <div id="pinModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-opacity duration-500">
+        <div class="glass-modal w-full max-w-md p-8 rounded-3xl text-center relative overflow-hidden">
+            
+            <!-- Default PIN Input View -->
+            <div id="pinBox" class="space-y-6">
+                <div class="w-16 h-16 mx-auto bg-blue-500/10 border border-blue-500/30 rounded-2xl flex items-center justify-center text-blue-400 text-2xl shadow-inner">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                
+                <div>
+                    <h2 class="text-2xl font-bold text-white tracking-wide">Security Access</h2>
+                    <p class="text-slate-400 text-sm mt-1">Is system ko access karne ke liye 4-digit PIN enter karein</p>
+                </div>
+
+                <!-- PIN Display Dots -->
+                <div class="flex justify-center gap-3 my-4">
+                    <input type="password" id="pinInput" maxlength="4" class="bg-slate-900/90 border border-slate-700/80 rounded-2xl px-4 py-3 text-center text-2xl tracking-[1em] font-mono font-bold text-blue-400 w-48 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all shadow-inner" placeholder="••••" autocomplete="off" autofocus>
+                </div>
+
+                <button onclick="verifyPin()" class="w-full py-3.5 px-6 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-blue-600/25 active:scale-[0.98]">
+                    Verify & Unlock
+                </button>
+            </div>
+
+            <!-- Error Notification Card -->
+            <div id="pinErrorCard" class="hidden space-y-4 py-2 animate-shake">
+                <div class="w-16 h-16 mx-auto bg-red-500/10 border border-red-500/30 rounded-2xl flex items-center justify-center text-red-500 text-3xl">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-red-400 tracking-wider">WRONG SECURITY PIN</h3>
+                    <p class="text-slate-400 text-sm mt-1">Aapne galat PIN enter kiya hai. Kripya sahi PIN daalein.</p>
+                </div>
+                <button onclick="resetPinForm()" class="mt-2 px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium rounded-lg border border-slate-700 transition-all">
+                    Try Again
+                </button>
+            </div>
+
+            <!-- Success Notification Card -->
+            <div id="pinSuccessCard" class="hidden space-y-4 py-2">
+                <div class="w-16 h-16 mx-auto bg-emerald-500/10 border border-emerald-500/30 rounded-2xl flex items-center justify-center text-emerald-400 text-3xl">
+                    <i class="fa-solid fa-circle-check"></i>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-emerald-400 tracking-wider">PERMISSION GRANTED</h3>
+                    <p class="text-slate-400 text-sm mt-1">Security verify ho chuki hai. Accessing system...</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- MAIN WEBSITE CONTENT CONTAINER -->
+    <div id="mainContent" class="filter blur-md transition-all duration-700 opacity-30 pointer-events-none flex-grow flex flex-col justify-between">
+        
+        <!-- NAVBAR / HEADER -->
+        <header class="w-full border-b border-slate-800/80 bg-slate-950/60 backdrop-blur-md sticky top-0 z-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+                
+                <!-- Logo / Brand -->
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400 text-lg">
+                        <i class="fa-solid fa-car-rear"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg text-white tracking-wide">M-VAHAN <span class="text-blue-500 text-xs px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 ml-1">PRO</span></h1>
+                        <p class="text-xs text-slate-400">Vehicle Verification Gateway</p>
+                    </div>
+                </div>
+
+                <!-- 3. BRANDING BADGE -->
+                <div class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/90 border border-blue-500/30 text-xs font-medium text-slate-300 glowing-badge">
+                    <span class="w-2 h-2 rounded-full bg-blue-500 pulse-dot animate-pulse"></span>
+                    <span>Managed by <strong class="text-white font-semibold">Vikas Mishra</strong></span>
+                </div>
+            </div>
+        </header>
+
+
+        <!-- HERO & SEARCH SECTION -->
+        <main class="max-w-5xl mx-auto px-4 py-10 w-full flex-grow">
+            
+            <!-- Search Card Container -->
+            <div class="glass-panel rounded-3xl p-6 sm:p-10 mb-8 relative overflow-hidden border border-slate-800">
+                <div class="absolute -top-24 -right-24 w-60 h-60 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <div class="text-center max-w-xl mx-auto mb-8">
+                    <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">Vehicle Lookup Portal</h2>
+                    <p class="text-slate-400 text-sm">RC Status, Owner Details, Insurance, PUC aur RTO Info real-time fetch karein.</p>
+                </div>
+
+                <!-- 4. SEARCH FORM & COOLDOWN SYSTEM -->
+                <form id="searchForm" onsubmit="handleSearch(event)" class="max-w-2xl mx-auto space-y-4">
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <div class="relative flex-grow">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+                                <i class="fa-solid fa-magnifying-glass"></i>
+                            </div>
+                            <input 
+                                type="text" 
+                                id="vehicleInput" 
+                                class="w-full pl-11 pr-4 py-4 bg-slate-950/80 border border-slate-700/80 rounded-2xl font-mono text-lg font-semibold tracking-wider text-white uppercase placeholder:normal-case placeholder:font-sans placeholder:text-slate-500 placeholder:text-base focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner" 
+                                placeholder="e.g. MH01AB1234, GJ05CX1400" 
+                                required
+                                autocomplete="off"
+                            >
+                        </div>
+                        <button 
+                            type="submit" 
+                            id="searchBtn" 
+                            class="sm:w-auto w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-600/20 flex items-center justify-center gap-2 whitespace-nowrap active:scale-[0.98]"
+                        >
+                            <span id="btnText">Search Details</span>
+                            <i id="btnIcon" class="fa-solid fa-arrow-right text-sm"></i>
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- LOADING SPINNER STATE -->
+            <div id="loadingState" class="hidden glass-panel rounded-3xl p-12 text-center my-6">
+                <div class="inline-block relative w-16 h-16 mb-4">
+                    <div class="w-16 h-16 rounded-full border-4 border-blue-500/20 border-t-blue-500 animate-spin"></div>
+                </div>
+                <h3 class="text-lg font-bold text-white tracking-wide">Fetching Vehicle Details...</h3>
+                <p class="text-xs text-slate-400 mt-1">MVAHAN Database se details synchronize ki ja rahi hain.</p>
+            </div>
+
+            <!-- 5. ERROR STATE / DETAILS NOT FOUND CARD -->
+            <div id="errorState" class="hidden glass-panel rounded-3xl p-8 sm:p-12 text-center my-6 border-red-500/30 bg-red-950/10">
+                <div class="w-20 h-20 mx-auto bg-red-500/10 border border-red-500/30 rounded-3xl flex items-center justify-center text-red-500 text-3xl mb-4 shadow-lg shadow-red-500/10">
+                    <i class="fa-solid fa-car-burst"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-red-400 mb-2">DETAILS NOT FOUND</h3>
+                <p id="errorMessageText" class="text-slate-300 text-sm max-w-md mx-auto leading-relaxed">
+                    Details not found. Please check the vehicle number or try again after 15 seconds.
+                </p>
+            </div>
+
+            <!-- 6. DATA DISPLAY LAYOUT (SUCCESS STATE) -->
+            <div id="resultContainer" class="hidden space-y-6">
+                
+                <!-- Main Highlights Banner -->
+                <div class="glass-panel rounded-3xl p-6 sm:p-8 border-l-4 border-l-blue-500 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <div class="flex items-center gap-3 mb-1">
+                            <span id="resRegNo" class="font-mono text-2xl sm:text-3xl font-extrabold text-white tracking-wider">--</span>
+                            <span id="resStatus" class="px-3 py-1 rounded-full text-xs font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ACTIVE</span>
+                        </div>
+                        <p id="resModel" class="text-slate-300 font-medium text-base">--</p>
+                    </div>
+                    <div class="flex items-center gap-2 bg-slate-900/80 px-4 py-2.5 rounded-2xl border border-slate-800">
+                        <i class="fa-solid fa-user-shield text-blue-400"></i>
+                        <span class="text-xs text-slate-400">Owner:</span>
+                        <span id="resOwner" class="text-sm font-bold text-white">--</span>
+                    </div>
+                </div>
+
+                <!-- Details Grid Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="detailsGrid">
+                    <!-- Cards dynamically rendered via JS -->
+                </div>
+
+            </div>
+
+        </main>
+
+
+        <!-- FOOTER & METADATA BADGES -->
+        <footer class="w-full border-t border-slate-800/80 bg-slate-950/80 backdrop-blur-md py-6 mt-12">
+            <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+                <div class="flex flex-wrap items-center justify-center gap-3">
+                    <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 font-mono text-slate-300">
+                        <i class="fa-solid fa-database text-blue-400 mr-1.5"></i>Source: BIZ FACTORY
+                    </span>
+                    <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 font-mono text-slate-300">
+                        <i class="fa-solid fa-key text-amber-400 mr-1.5"></i>Key Expiry: 2026-11-17
+                    </span>
+                </div>
+                <div class="text-center sm:text-right">
+                    <p>&copy; 2026 M-Vahan Verification System. All rights reserved.</p>
+                </div>
+            </div>
+        </footer>
+
+    </div>
+
+
+    <!-- JAVASCRIPT LOGIC -->
+    <script>
+        // ----------------------------------------------------
+        // 2. SECURITY CONTROLS & PROTECTION
+        // ----------------------------------------------------
+        
+        // Disable Right-Click Menu
+        document.addEventListener('contextmenu', function (e) {
+            e.preventDefault();
         });
 
-        const imgData = canvas.toDataURL('image/png', 1.0);
-        pdf.addImage(imgData, 'PNG', 0, 0, 595, 842, undefined, 'NONE');
-        pdf.save('RC_Filled_Card.pdf');
-    }
+        // Block Developer Keyboard Shortcuts
+        document.addEventListener('keydown', function (e) {
+            // Block F12
+            if (e.key === 'F12') {
+                e.preventDefault();
+                return false;
+            }
+            // Block Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
+                e.preventDefault();
+                return false;
+            }
+            // Block Ctrl+U (View Source) and Ctrl+S (Save)
+            if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S')) {
+                e.preventDefault();
+                return false;
+            }
+        });
 
-    // Initial Preview Load
-    window.onload = renderCanvas;
-</script>
 
+        // ----------------------------------------------------
+        // 1. PIN LOCK SYSTEM LOGIC
+        // ----------------------------------------------------
+        const CORRECT_PIN = "9696";
+
+        function verifyPin() {
+            const pinInput = document.getElementById('pinInput');
+            const userPin = pinInput.value.trim();
+
+            if (userPin === CORRECT_PIN) {
+                // Correct PIN Flow
+                document.getElementById('pinBox').classList.add('hidden');
+                document.getElementById('pinSuccessCard').classList.remove('hidden');
+
+                setTimeout(() => {
+                    const pinModal = document.getElementById('pinModal');
+                    const mainContent = document.getElementById('mainContent');
+
+                    pinModal.classList.add('opacity-0', 'pointer-events-none');
+                    mainContent.classList.remove('blur-md', 'opacity-30', 'pointer-events-none');
+                    
+                    setTimeout(() => {
+                        pinModal.style.display = 'none';
+                    }, 500);
+                }, 1000);
+
+            } else {
+                // Incorrect PIN Flow
+                document.getElementById('pinBox').classList.add('hidden');
+                document.getElementById('pinErrorCard').classList.remove('hidden');
+            }
+        }
+
+        function resetPinForm() {
+            const pinInput = document.getElementById('pinInput');
+            pinInput.value = '';
+            document.getElementById('pinErrorCard').classList.add('hidden');
+            document.getElementById('pinBox').classList.remove('hidden');
+            pinInput.focus();
+        }
+
+        // Auto submit PIN on entering 4 digits
+        document.getElementById('pinInput').addEventListener('input', function(e) {
+            if (this.value.length === 4) {
+                verifyPin();
+            }
+        });
+
+
+        // ----------------------------------------------------
+        // 4 & 5. SEARCH & API COOLDOWN LOGIC
+        // ----------------------------------------------------
+        let isCooldownActive = false;
+
+        async function handleSearch(event) {
+            event.preventDefault();
+            if (isCooldownActive) return;
+
+            const inputField = document.getElementById('vehicleInput');
+            const regNo = inputField.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+            if (!regNo) return;
+
+            // Reset UI States
+            document.getElementById('errorState').classList.add('hidden');
+            document.getElementById('resultContainer').classList.add('hidden');
+            document.getElementById('loadingState').classList.remove('hidden');
+
+            // Trigger Cooldown Timer
+            startCooldown(7);
+
+            // API Fetch with 15 Seconds Timeout Setup
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 Seconds timeout
+
+            const apiUrl = `https://hideme.eu.org/lookup?api=mvahan&key=mk-4px4ohkcxybb&number=${regNo}`;
+
+            try {
+                const response = await fetch(apiUrl, { signal: controller.signal });
+                clearTimeout(timeoutId);
+
+                if (!response.ok) throw new Error("Network error or invalid response");
+
+                const data = await response.json();
+
+                // Validate API Response Structure
+                if (data && (data.success === true || data.status === "success" || data.vehicle)) {
+                    const vehicle = data.vehicle || data.data || data;
+                    
+                    // Check if vehicle object is empty or null
+                    if (!vehicle || Object.keys(vehicle).length === 0) {
+                        showError("Details not found. Please check the vehicle number or try again after 15 seconds.");
+                    } else {
+                        renderVehicleData(vehicle, regNo);
+                    }
+                } else {
+                    showError("Details not found. Please check the vehicle number or try again after 15 seconds.");
+                }
+
+            } catch (err) {
+                clearTimeout(timeoutId);
+                showError("Details not found. Please check the vehicle number or try again after 15 seconds.");
+            } finally {
+                document.getElementById('loadingState').classList.add('hidden');
+            }
+        }
+
+        function startCooldown(seconds) {
+            isCooldownActive = true;
+            const btn = document.getElementById('searchBtn');
+            const btnText = document.getElementById('btnText');
+            const btnIcon = document.getElementById('btnIcon');
+
+            btn.disabled = true;
+            btnIcon.className = "fa-solid fa-clock text-sm animate-spin";
+
+            let timeLeft = seconds;
+            btnText.textContent = `Wait ${timeLeft}s...`;
+
+            const timer = setInterval(() => {
+                timeLeft--;
+                if (timeLeft > 0) {
+                    btnText.textContent = `Wait ${timeLeft}s...`;
+                } else {
+                    clearInterval(timer);
+                    isCooldownActive = false;
+                    btn.disabled = false;
+                    btnText.textContent = "Search Details";
+                    btnIcon.className = "fa-solid fa-arrow-right text-sm";
+                }
+            }, 1000);
+        }
+
+        function showError(msg) {
+            document.getElementById('errorMessageText').textContent = msg;
+            document.getElementById('errorState').classList.remove('hidden');
+        }
+
+
+        // ----------------------------------------------------
+        // 6. DATA RENDERING FUNCTION
+        // ----------------------------------------------------
+        function renderVehicleData(v, inputRegNo) {
+            const container = document.getElementById('resultContainer');
+            const grid = document.getElementById('detailsGrid');
+
+            // Header Banner Fill
+            document.getElementById('resRegNo').textContent = v.registration_number || v.regNo || inputRegNo;
+            document.getElementById('resModel').textContent = `${v.maker || ''} ${v.model || v.maker_model || 'Vehicle Details'}`.trim();
+            document.getElementById('resOwner').textContent = v.owner_name || v.owner || 'N/A';
+            
+            const statusEl = document.getElementById('resStatus');
+            const statusText = v.status || v.rc_status || 'ACTIVE';
+            statusEl.textContent = statusText;
+
+            // Field Definitions with FontAwesome Icons
+            const fields = [
+                { label: 'Father/Husband Name', value: v.father_name || v.husband_name, icon: 'fa-user-group' },
+                { label: 'Vehicle Class', value: v.vehicle_class || v.class, icon: 'fa-car' },
+                { label: 'Fuel Type', value: v.fuel_type || v.fuel, icon: 'fa-gas-pump' },
+                { label: 'Engine Number', value: v.engine_number || v.engine_no, icon: 'fa-gears' },
+                { label: 'Chassis Number', value: v.chassis_number || v.chassis_no, icon: 'fa-barcode' },
+                { label: 'Registration Date', value: v.registration_date || v.reg_date, icon: 'fa-calendar-check' },
+                { label: 'Fitness / RC Validity', value: v.fitness_upto || v.rc_expiry, icon: 'fa-shield-heart' },
+                { label: 'Insurance Company', value: v.insurance_company || v.insurance_provider, icon: 'fa-building-shield' },
+                { label: 'Insurance Valid Upto', value: v.insurance_upto || v.insurance_expiry, icon: 'fa-file-contract' },
+                { label: 'PUC Validity', value: v.puc_upto || v.puc_expiry, icon: 'fa-smog' },
+                { label: 'Registering Authority (RTO)', value: v.rto_name || v.rto, icon: 'fa-landmark' },
+                { label: 'Color', value: v.color, icon: 'fa-palette' },
+                { label: 'Emission Norms', value: v.norms || v.emission_norms, icon: 'fa-leaf' },
+                { label: 'Financier / Hypothecation', value: v.financier, icon: 'fa-piggy-bank' }
+            ];
+
+            grid.innerHTML = '';
+
+            fields.forEach(field => {
+                const val = (field.value && field.value.toString().trim() !== '' && field.value.toString().trim() !== 'null') 
+                    ? field.value 
+                    : null;
+
+                const cardHtml = `
+                    <div class="glass-panel p-4 rounded-2xl border border-slate-800/80 hover:border-slate-700 transition-all">
+                        <div class="flex items-center gap-3">
+                            <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-blue-400 text-sm">
+                                <i class="fa-solid ${field.icon}"></i>
+                            </div>
+                            <div class="overflow-hidden">
+                                <p class="text-xs text-slate-400 font-medium">${field.label}</p>
+                                <p class="text-sm font-semibold text-slate-100 truncate mt-0.5 font-mono">
+                                    ${val ? val : '<span class="text-slate-600 font-normal font-sans">N/A</span>'}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                grid.innerHTML += cardHtml;
+            });
+
+            container.classList.remove('hidden');
+        }
+    </script>
 </body>
 </html>
