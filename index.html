@@ -22,9 +22,9 @@
                     },
                     colors: {
                         cyber: {
-                            bg: '#090d16',
-                            card: '#111827',
-                            border: '#1f2937',
+                            bg: '#060911',
+                            card: '#0f172a',
+                            border: '#1e293b',
                             accent: '#3b82f6',
                             glow: '#60a5fa',
                         }
@@ -48,30 +48,30 @@
             width: 8px;
         }
         ::-webkit-scrollbar-track {
-            background: #090d16;
+            background: #060911;
         }
         ::-webkit-scrollbar-thumb {
-            background: #1f2937;
+            background: #1e293b;
             border-radius: 4px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: #374151;
+            background: #334155;
         }
 
         /* Glassmorphism Styles */
         .glass-panel {
-            background: rgba(17, 24, 39, 0.75);
+            background: rgba(15, 23, 42, 0.75);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
         .glass-modal {
-            background: rgba(10, 15, 26, 0.85);
+            background: rgba(10, 15, 26, 0.88);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            box-shadow: 0 0 50px -12px rgba(59, 130, 246, 0.25);
+            border: 1px solid rgba(59, 130, 246, 0.25);
+            box-shadow: 0 0 50px -12px rgba(59, 130, 246, 0.3);
         }
 
         /* Animations */
@@ -97,7 +97,7 @@
 <body class="min-h-screen flex flex-col justify-between overflow-x-hidden relative">
 
     <!-- 1. SECURITY LOCK SYSTEM (PIN SCREEN MODAL) -->
-    <div id="pinModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md transition-opacity duration-500">
+    <div id="pinModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md transition-opacity duration-500">
         <div class="glass-modal w-full max-w-md p-8 rounded-3xl text-center relative overflow-hidden">
             
             <!-- Default PIN Input View -->
@@ -108,10 +108,10 @@
                 
                 <div>
                     <h2 class="text-2xl font-bold text-white tracking-wide">Security Access</h2>
-                    <p class="text-slate-400 text-sm mt-1">Is system ko access karne ke liye 4-digit PIN enter karein</p>
+                    <p class="text-slate-400 text-sm mt-1">Enter 4-digit PIN to access portal</p>
                 </div>
 
-                <!-- PIN Display Dots -->
+                <!-- PIN Display Input -->
                 <div class="flex justify-center gap-3 my-4">
                     <input type="password" id="pinInput" maxlength="4" class="bg-slate-900/90 border border-slate-700/80 rounded-2xl px-4 py-3 text-center text-2xl tracking-[1em] font-mono font-bold text-blue-400 w-48 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30 transition-all shadow-inner" placeholder="••••" autocomplete="off" autofocus>
                 </div>
@@ -142,7 +142,7 @@
                 </div>
                 <div>
                     <h3 class="text-xl font-bold text-emerald-400 tracking-wider">PERMISSION GRANTED</h3>
-                    <p class="text-slate-400 text-sm mt-1">Security verify ho chuki hai. Accessing system...</p>
+                    <p class="text-slate-400 text-sm mt-1">Security verify ho chuki hai. Unlocking portal...</p>
                 </div>
             </div>
 
@@ -186,7 +186,7 @@
                 
                 <div class="text-center max-w-xl mx-auto mb-8">
                     <h2 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight mb-2">Vehicle Lookup Portal</h2>
-                    <p class="text-slate-400 text-sm">RC Status, Owner Details, Insurance, PUC aur RTO Info real-time fetch karein.</p>
+                    <p class="text-slate-400 text-sm">RC Status, Owner Details, Address, Insurance & RTO Info real-time fetch karein.</p>
                 </div>
 
                 <!-- 4. SEARCH FORM & COOLDOWN SYSTEM -->
@@ -200,7 +200,7 @@
                                 type="text" 
                                 id="vehicleInput" 
                                 class="w-full pl-11 pr-4 py-4 bg-slate-950/80 border border-slate-700/80 rounded-2xl font-mono text-lg font-semibold tracking-wider text-white uppercase placeholder:normal-case placeholder:font-sans placeholder:text-slate-500 placeholder:text-base focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner" 
-                                placeholder="e.g. MH01AB1234, GJ05CX1400" 
+                                placeholder="e.g. GJ05MS9717, MH01AB1234" 
                                 required
                                 autocomplete="off"
                             >
@@ -245,7 +245,7 @@
                     <div>
                         <div class="flex items-center gap-3 mb-1">
                             <span id="resRegNo" class="font-mono text-2xl sm:text-3xl font-extrabold text-white tracking-wider">--</span>
-                            <span id="resStatus" class="px-3 py-1 rounded-full text-xs font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">ACTIVE</span>
+                            <span id="resStatus" class="px-3 py-1 rounded-full text-xs font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">VERIFIED</span>
                         </div>
                         <p id="resModel" class="text-slate-300 font-medium text-base">--</p>
                     </div>
@@ -256,9 +256,22 @@
                     </div>
                 </div>
 
-                <!-- Details Grid Cards -->
+                <!-- ADDRESS BANNER (HIGH PRIORITY) -->
+                <div id="addressCard" class="hidden glass-panel p-5 rounded-2xl border border-blue-500/30 bg-blue-950/10">
+                    <div class="flex items-start gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-blue-500/10 border border-blue-500/30 flex items-center justify-center text-blue-400 text-base shrink-0 mt-0.5">
+                            <i class="fa-solid fa-location-dot"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400 font-medium uppercase tracking-wider">Registered Address</p>
+                            <p id="resAddress" class="text-sm sm:text-base font-semibold text-slate-100 mt-1 leading-relaxed">--</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Details Grid Cards (Only Non-Null Fields Will Be Rendered) -->
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="detailsGrid">
-                    <!-- Cards dynamically rendered via JS -->
+                    <!-- Dynamic Non-Null Cards -->
                 </div>
 
             </div>
@@ -270,11 +283,14 @@
         <footer class="w-full border-t border-slate-800/80 bg-slate-950/80 backdrop-blur-md py-6 mt-12">
             <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-400">
                 <div class="flex flex-wrap items-center justify-center gap-3">
-                    <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 font-mono text-slate-300">
+                    <span id="metaSource" class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 font-mono text-slate-300">
                         <i class="fa-solid fa-database text-blue-400 mr-1.5"></i>Source: BIZ FACTORY
                     </span>
-                    <span class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 font-mono text-slate-300">
+                    <span id="metaExpiry" class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 font-mono text-slate-300">
                         <i class="fa-solid fa-key text-amber-400 mr-1.5"></i>Key Expiry: 2026-11-17
+                    </span>
+                    <span id="metaDev" class="px-2.5 py-1 rounded-md bg-slate-900 border border-slate-800 font-mono text-slate-300">
+                        <i class="fa-solid fa-code text-emerald-400 mr-1.5"></i>Dev: @mk_hossain
                     </span>
                 </div>
                 <div class="text-center sm:text-right">
@@ -291,25 +307,19 @@
         // ----------------------------------------------------
         // 2. SECURITY CONTROLS & PROTECTION
         // ----------------------------------------------------
-        
-        // Disable Right-Click Menu
         document.addEventListener('contextmenu', function (e) {
             e.preventDefault();
         });
 
-        // Block Developer Keyboard Shortcuts
         document.addEventListener('keydown', function (e) {
-            // Block F12
             if (e.key === 'F12') {
                 e.preventDefault();
                 return false;
             }
-            // Block Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
             if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) {
                 e.preventDefault();
                 return false;
             }
-            // Block Ctrl+U (View Source) and Ctrl+S (Save)
             if (e.ctrlKey && (e.key === 'u' || e.key === 'U' || e.key === 's' || e.key === 'S')) {
                 e.preventDefault();
                 return false;
@@ -327,7 +337,6 @@
             const userPin = pinInput.value.trim();
 
             if (userPin === CORRECT_PIN) {
-                // Correct PIN Flow
                 document.getElementById('pinBox').classList.add('hidden');
                 document.getElementById('pinSuccessCard').classList.remove('hidden');
 
@@ -344,7 +353,6 @@
                 }, 1000);
 
             } else {
-                // Incorrect PIN Flow
                 document.getElementById('pinBox').classList.add('hidden');
                 document.getElementById('pinErrorCard').classList.remove('hidden');
             }
@@ -358,7 +366,6 @@
             pinInput.focus();
         }
 
-        // Auto submit PIN on entering 4 digits
         document.getElementById('pinInput').addEventListener('input', function(e) {
             if (this.value.length === 4) {
                 verifyPin();
@@ -385,10 +392,8 @@
             document.getElementById('resultContainer').classList.add('hidden');
             document.getElementById('loadingState').classList.remove('hidden');
 
-            // Trigger Cooldown Timer
             startCooldown(7);
 
-            // API Fetch with 15 Seconds Timeout Setup
             const controller = new AbortController();
             const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 Seconds timeout
 
@@ -402,16 +407,8 @@
 
                 const data = await response.json();
 
-                // Validate API Response Structure
-                if (data && (data.success === true || data.status === "success" || data.vehicle)) {
-                    const vehicle = data.vehicle || data.data || data;
-                    
-                    // Check if vehicle object is empty or null
-                    if (!vehicle || Object.keys(vehicle).length === 0) {
-                        showError("Details not found. Please check the vehicle number or try again after 15 seconds.");
-                    } else {
-                        renderVehicleData(vehicle, regNo);
-                    }
+                if (data && data.success === true && data.vehicle) {
+                    renderVehicleData(data, regNo);
                 } else {
                     showError("Details not found. Please check the vehicle number or try again after 15 seconds.");
                 }
@@ -457,66 +454,93 @@
 
 
         // ----------------------------------------------------
-        // 6. DATA RENDERING FUNCTION
+        // 6. DYNAMIC DATA RENDERING (ONLY NON-NULL FIELDS)
         // ----------------------------------------------------
-        function renderVehicleData(v, inputRegNo) {
+        function renderVehicleData(rootData, inputRegNo) {
+            const v = rootData.vehicle || {};
             const container = document.getElementById('resultContainer');
             const grid = document.getElementById('detailsGrid');
 
-            // Header Banner Fill
-            document.getElementById('resRegNo').textContent = v.registration_number || v.regNo || inputRegNo;
-            document.getElementById('resModel').textContent = `${v.maker || ''} ${v.model || v.maker_model || 'Vehicle Details'}`.trim();
-            document.getElementById('resOwner').textContent = v.owner_name || v.owner || 'N/A';
+            // Banner Elements
+            document.getElementById('resRegNo').textContent = v.registration_no || rootData.reg_no || inputRegNo;
+            
+            const fullModel = [v.make, v.model, v.variant].filter(Boolean).join(' - ');
+            document.getElementById('resModel').textContent = fullModel || 'Vehicle Details';
+            document.getElementById('resOwner').textContent = v.owner || 'N/A';
             
             const statusEl = document.getElementById('resStatus');
-            const statusText = v.status || v.rc_status || 'ACTIVE';
-            statusEl.textContent = statusText;
+            statusEl.textContent = v.status ? v.status.toUpperCase() : 'VERIFIED';
 
-            // Field Definitions with FontAwesome Icons
-            const fields = [
-                { label: 'Father/Husband Name', value: v.father_name || v.husband_name, icon: 'fa-user-group' },
-                { label: 'Vehicle Class', value: v.vehicle_class || v.class, icon: 'fa-car' },
-                { label: 'Fuel Type', value: v.fuel_type || v.fuel, icon: 'fa-gas-pump' },
-                { label: 'Engine Number', value: v.engine_number || v.engine_no, icon: 'fa-gears' },
-                { label: 'Chassis Number', value: v.chassis_number || v.chassis_no, icon: 'fa-barcode' },
-                { label: 'Registration Date', value: v.registration_date || v.reg_date, icon: 'fa-calendar-check' },
-                { label: 'Fitness / RC Validity', value: v.fitness_upto || v.rc_expiry, icon: 'fa-shield-heart' },
-                { label: 'Insurance Company', value: v.insurance_company || v.insurance_provider, icon: 'fa-building-shield' },
-                { label: 'Insurance Valid Upto', value: v.insurance_upto || v.insurance_expiry, icon: 'fa-file-contract' },
-                { label: 'PUC Validity', value: v.puc_upto || v.puc_expiry, icon: 'fa-smog' },
-                { label: 'Registering Authority (RTO)', value: v.rto_name || v.rto, icon: 'fa-landmark' },
+            // Registered Address Card Logic (High-Value Visibility)
+            const addressCard = document.getElementById('addressCard');
+            if (v.address && v.address.trim() !== '') {
+                document.getElementById('resAddress').textContent = v.address;
+                addressCard.classList.remove('hidden');
+            } else {
+                addressCard.classList.add('hidden');
+            }
+
+            // Update Metadata Footer Badges
+            if (v.source) {
+                document.getElementById('metaSource').innerHTML = `<i class="fa-solid fa-database text-blue-400 mr-1.5"></i>Source: ${v.source}`;
+            }
+            if (rootData.key_expiry) {
+                document.getElementById('metaExpiry').innerHTML = `<i class="fa-solid fa-key text-amber-400 mr-1.5"></i>Key Expiry: ${rootData.key_expiry}`;
+            }
+            if (rootData.developer) {
+                document.getElementById('metaDev').innerHTML = `<i class="fa-solid fa-code text-emerald-400 mr-1.5"></i>Dev: ${rootData.developer}`;
+            }
+
+            // Complete Mapping of Fields with Fallback Keys
+            const allPossibleFields = [
+                { label: 'Mobile Number', value: rootData.mobile, icon: 'fa-phone-volume', isHighlight: true },
+                { label: 'Father/Husband Name', value: v.father_name, icon: 'fa-user-group' },
+                { label: 'Chassis Number', value: v.chassis, icon: 'fa-barcode' },
+                { label: 'Chassis Last 5', value: rootData.chassis_last5, icon: 'fa-fingerprint' },
+                { label: 'Engine Number', value: v.engine, icon: 'fa-gears' },
+                { label: 'Vehicle Class', value: v.vehicle_class, icon: 'fa-car' },
+                { label: 'Vehicle Category', value: v.vehicle_category, icon: 'fa-layer-group' },
+                { label: 'Body Type', value: v.body_type, icon: 'fa-truck-pickup' },
+                { label: 'Fuel Type', value: v.fuel, icon: 'fa-gas-pump' },
+                { label: 'Registration Date', value: v.registration_date, icon: 'fa-calendar-check' },
+                { label: 'Insurance Company', value: v.insurance_company, icon: 'fa-building-shield' },
+                { label: 'Insurance Policy No', value: v.insurance_policy_no, icon: 'fa-file-shield' },
+                { label: 'Insurance Valid Upto', value: v.insurance_upto, icon: 'fa-file-contract' },
+                { label: 'PUC Number', value: v.puc_no, icon: 'fa-smog' },
+                { label: 'PUC Valid Upto', value: v.puc_upto, icon: 'fa-calendar-xmark' },
+                { label: 'Fitness Valid Upto', value: v.fit_upto, icon: 'fa-shield-heart' },
+                { label: 'Tax Valid Upto', value: v.tax_upto, icon: 'fa-receipt' },
+                { label: 'City', value: v.city, icon: 'fa-city' },
+                { label: 'Registering Authority (RTO)', value: v.rto, icon: 'fa-landmark' },
                 { label: 'Color', value: v.color, icon: 'fa-palette' },
-                { label: 'Emission Norms', value: v.norms || v.emission_norms, icon: 'fa-leaf' },
+                { label: 'Cubic Capacity (CC)', value: v.cubic_capacity, icon: 'fa-gauge-high' },
+                { label: 'Seating Capacity', value: v.seating_capacity, icon: 'fa-chair' },
+                { label: 'Emission Norms', value: v.norms, icon: 'fa-leaf' },
                 { label: 'Financier / Hypothecation', value: v.financier, icon: 'fa-piggy-bank' }
             ];
 
             grid.innerHTML = '';
 
-            fields.forEach(field => {
-                const val = (field.value && field.value.toString().trim() !== '' && field.value.toString().trim() !== 'null') 
-                    ? field.value 
-                    : null;
+            // FILTER & RENDER: Strictly show ONLY fields that have actual valid values
+            allPossibleFields.forEach(field => {
+                const isValidValue = field.value !== null && 
+                                     field.value !== undefined && 
+                                     field.value.toString().trim() !== '' && 
+                                     field.value.toString().trim().toLowerCase() !== 'null';
 
-                const cardHtml = `
-                    <div class="glass-panel p-4 rounded-2xl border border-slate-800/80 hover:border-slate-700 transition-all">
-                        <div class="flex items-center gap-3">
-                            <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-blue-400 text-sm">
-                                <i class="fa-solid ${field.icon}"></i>
-                            </div>
-                            <div class="overflow-hidden">
-                                <p class="text-xs text-slate-400 font-medium">${field.label}</p>
-                                <p class="text-sm font-semibold text-slate-100 truncate mt-0.5 font-mono">
-                                    ${val ? val : '<span class="text-slate-600 font-normal font-sans">N/A</span>'}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                `;
-                grid.innerHTML += cardHtml;
-            });
+                if (isValidValue) {
+                    const highlightClass = field.isHighlight 
+                        ? 'border-emerald-500/40 bg-emerald-950/10' 
+                        : 'border-slate-800/80 hover:border-slate-700';
 
-            container.classList.remove('hidden');
-        }
-    </script>
-</body>
-</html>
+                    const iconColor = field.isHighlight ? 'text-emerald-400' : 'text-blue-400';
+
+                    const cardHtml = `
+                        <div class="glass-panel p-4 rounded-2xl border ${highlightClass} transition-all">
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center ${iconColor} text-sm shrink-0">
+                                    <i class="fa-solid ${field.icon}"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <p class="text-xs text-slate-400 font-medium">${field.label}</p>
+                                    <p class="text-sm font-
