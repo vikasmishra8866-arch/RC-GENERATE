@@ -1,24 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>VahanVerify Pro - Vehicle Information Gateway</title>
-    
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Any Vehicle RC Book Download | Pro Portal</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
     
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
                         mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    colors: {
+                        cyber: {
+                            bg: '#060911',
+                            card: '#0f172a',
+                            border: '#1e293b',
+                            accent: '#3b82f6',
+                        }
                     }
                 }
             }
@@ -27,517 +35,243 @@
 
     <style>
         body {
-            background-color: #0b132b;
+            background-color: #060911;
             color: #f3f4f6;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
             user-select: none;
-            -webkit-user-select: none;
-            touch-action: manipulation;
         }
 
-        ::-webkit-scrollbar {
-            width: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #0b132b;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1c2541;
-            border-radius: 4px;
-        }
-
-        .dark-header-card {
-            background: linear-gradient(135deg, #1c2541 0%, #0b132b 100%);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .info-card {
-            background: #1c2541;
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
         }
 
-        .key-label {
-            color: #94a3b8;
-            font-size: 0.75rem;
-            font-weight: 500;
+        /* Hacker Scanner Animation */
+        .scanner-line {
+            width: 100%;
+            height: 3px;
+            background: #22c55e;
+            box-shadow: 0 0 15px #22c55e, 0 0 30px #22c55e;
+            position: absolute;
+            animation: scan 2s linear infinite;
         }
 
-        .val-text {
-            color: #f8fafc;
-            font-size: 0.825rem;
-            font-weight: 700;
+        @keyframes scan {
+            0% { top: 0%; }
+            50% { top: 100%; }
+            100% { top: 0%; }
         }
 
-        .vehicle-logo-glow {
-            box-shadow: 0 0 20px -3px rgba(37, 99, 235, 0.5);
-        }
-
-        @media print {
-            header, form, #loadingState, #errorState, footer, button {
-                display: none !important;
-            }
-            body {
-                background: #ffffff !important;
-                color: #000000 !important;
-            }
-            .info-card, .dark-header-card {
-                background: #ffffff !important;
-                border: 1px solid #000000 !important;
-                color: #000000 !important;
-                box-shadow: none !important;
-            }
-            .key-label { color: #475569 !important; }
-            .val-text { color: #000000 !important; }
+        .matrix-bg {
+            background: radial-gradient(circle, rgba(15,23,42,0.9) 0%, rgba(6,9,17,0.98) 100%);
         }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between">
+<body class="min-h-screen flex flex-col justify-between relative overflow-x-hidden">
 
-    <!-- HEADER / NAVBAR -->
-    <header class="w-full bg-[#1c2541]/80 backdrop-blur-md text-white py-4 px-6 border-b border-slate-800 sticky top-0 z-40">
-        <div class="max-w-6xl mx-auto flex items-center justify-between">
+    <!-- TOP NAVBAR WITH WALLET -->
+    <header class="w-full border-b border-slate-800/80 bg-slate-950/80 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-500 flex items-center justify-center text-white text-lg shadow-lg shadow-blue-500/30">
-                    <i class="fa-solid fa-shield-halved"></i>
+                <div class="w-10 h-10 rounded-xl bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400 text-lg shadow-lg">
+                    <i class="fa-solid fa-file-shield"></i>
                 </div>
                 <div>
-                    <h1 class="font-bold text-base tracking-wide leading-none text-white">VahanVerify <span class="text-[10px] bg-blue-600 text-white px-1.5 py-0.5 rounded ml-1">PRO</span></h1>
-                    <p class="text-[11px] text-slate-400 mt-1">Vehicle Info & History Portal</p>
+                    <h1 class="font-bold text-lg text-white tracking-wide">RC BOOK <span class="text-blue-500 text-xs px-2 py-0.5 rounded bg-blue-500/10 border border-blue-500/20 ml-1">DOWNLOAD PRO</span></h1>
+                    <p class="text-xs text-slate-400">Instant Digital Document Gateway</p>
                 </div>
             </div>
 
-            <!-- BRANDING BADGE -->
-            <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900/80 border border-slate-700 text-xs font-medium text-slate-300">
-                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                <span>Managed by <strong class="text-white font-semibold">Vikas Mishra</strong></span>
+            <!-- WALLET SECTION -->
+            <div class="flex items-center gap-3">
+                <div class="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 border border-slate-800 text-sm">
+                    <i class="fa-solid fa-wallet text-emerald-400"></i>
+                    <span class="text-slate-400 text-xs">Balance:</span>
+                    <strong class="text-white font-mono" id="walletBalance">₹450.00</strong>
+                </div>
+                <button onclick="triggerPaymentServerError()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-emerald-600/20 flex items-center gap-1.5">
+                    <i class="fa-solid fa-plus"></i> Add Money
+                </button>
             </div>
         </div>
     </header>
 
 
     <!-- MAIN CONTENT -->
-    <main class="max-w-6xl mx-auto px-4 py-8 w-full flex-grow space-y-6">
-
-        <!-- SEARCH SECTION -->
-        <div class="text-center max-w-xl mx-auto space-y-4">
-            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                Enter Registration Number to Fetch Details
-            </label>
+    <main class="max-w-4xl mx-auto px-4 py-16 w-full flex-grow flex flex-col items-center justify-center">
+        
+        <div class="glass-panel rounded-3xl p-8 sm:p-12 w-full relative overflow-hidden border border-slate-800 shadow-2xl">
+            <div class="absolute -top-24 -right-24 w-60 h-60 bg-blue-600/10 rounded-full blur-3xl pointer-events-none"></div>
             
-            <form id="searchForm" onsubmit="event.preventDefault(); handleSearch();" class="flex flex-col sm:flex-row gap-2">
-                <div class="relative flex-grow">
-                    <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
-                        <i class="fa-solid fa-magnifying-glass text-sm"></i>
-                    </div>
-                    <input 
-                        type="text" 
-                        id="vehicleInput" 
-                        class="w-full pl-10 pr-4 py-3 bg-[#1c2541] border border-slate-700 rounded-lg font-mono text-base font-bold text-white uppercase placeholder:normal-case placeholder:font-sans placeholder:text-slate-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 shadow-sm" 
-                        placeholder="Enter Registration No. (e.g. GJ05MS9717)" 
-                        required
-                        autocomplete="off"
-                        autocorrect="off"
-                        autocapitalize="characters"
-                        spellcheck="false"
-                        oninput="this.value = this.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase()"
-                    >
-                </div>
-                <button 
-                    type="submit" 
-                    id="searchBtn" 
-                    class="px-6 py-3 bg-blue-600 hover:bg-blue-500 disabled:bg-slate-800 disabled:text-slate-500 text-white text-sm font-bold rounded-lg transition-all shadow-lg flex items-center justify-center gap-2 whitespace-nowrap active:scale-95 cursor-pointer"
-                >
-                    <i id="btnIcon" class="fa-solid fa-magnifying-glass text-xs"></i>
-                    <span id="btnText">Search Vehicle</span>
-                </button>
-            </form>
-            <p class="text-[11px] text-slate-400">Universal support for Mobile, Tablet and Desktop devices.</p>
-        </div>
-
-
-        <!-- LOADING STATE -->
-        <div id="loadingState" class="hidden info-card rounded-xl p-10 text-center shadow-sm">
-            <div class="inline-block relative w-12 h-12 mb-3">
-                <div class="w-12 h-12 rounded-full border-4 border-slate-700 border-t-blue-500 animate-spin"></div>
-            </div>
-            <h3 class="text-sm font-bold text-white">Fetching Vehicle Details...</h3>
-            <p class="text-xs text-slate-400 mt-1">Multi-proxy anti-block engine is processing request...</p>
-        </div>
-
-
-        <!-- ERROR STATE CARD -->
-        <div id="errorState" class="hidden bg-red-950/40 border border-red-500/30 rounded-xl p-8 text-center shadow-sm">
-            <div class="w-12 h-12 mx-auto bg-red-900/50 rounded-full flex items-center justify-center text-red-400 text-xl mb-3">
-                <i class="fa-solid fa-triangle-exclamation"></i>
-            </div>
-            <h3 class="text-lg font-bold text-red-400 mb-1">DETAILS NOT FOUND</h3>
-            <p id="errorMessageText" class="text-xs text-slate-300 max-w-md mx-auto">
-                Details not found. Please check the vehicle number or try again after 15 seconds.
-            </p>
-        </div>
-
-
-        <!-- RESULTS CONTAINER -->
-        <div id="resultContainer" class="hidden space-y-4">
-            
-            <!-- TOP DARK BANNER -->
-            <div class="dark-header-card rounded-xl p-5 sm:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-md relative overflow-hidden">
-                <div class="flex items-center gap-4 relative z-10">
-                    <div class="w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-indigo-600 border border-blue-400/40 flex items-center justify-center text-white text-2xl shrink-0 vehicle-logo-glow">
-                        <i id="vehicleLogoIcon" class="fa-solid fa-shield-halved"></i>
-                    </div>
-
-                    <div>
-                        <div class="flex items-center gap-2 mb-1">
-                            <span id="resRegNo" class="font-mono text-xl sm:text-2xl font-extrabold tracking-wide text-white">--</span>
-                            <span id="resStatus" class="px-2.5 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">ACTIVE</span>
-                        </div>
-                        <p id="resModel" class="text-slate-300 text-xs sm:text-sm font-medium">--</p>
-                    </div>
-                </div>
-
-                <div class="flex flex-wrap items-center gap-2 text-xs font-mono relative z-10">
-                    <span id="resFuel" class="hidden px-3 py-1 rounded bg-slate-900/90 text-slate-200 border border-slate-700">--</span>
-                    <span id="resNorms" class="hidden px-3 py-1 rounded bg-slate-900/90 text-slate-200 border border-slate-700">--</span>
-                </div>
-            </div>
-
-
-            <!-- GRID SECTION -->
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4" id="detailsGrid">
+            <div class="text-center max-w-lg mx-auto mb-8">
+                <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20 uppercase tracking-widest">Official Gateway</span>
                 
-                <!-- OWNER DETAILS CARD -->
-                <div id="cardOwner" class="hidden info-card rounded-xl p-4 space-y-3">
-                    <div class="flex items-center gap-2 pb-2 border-b border-slate-800 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        <i class="fa-solid fa-user text-blue-400"></i> Owner Details
-                    </div>
-                    <div class="space-y-2.5" id="listOwner"></div>
+                <h2 class="text-3xl sm:text-4xl font-extrabold text-white tracking-tight mt-3 mb-3">Any Vehicle RC Book Download</h2>
+                
+                <!-- CHARGE DISPLAY BADGE -->
+                <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold mb-3 shadow-inner">
+                    <i class="fa-solid fa-tag text-amber-400"></i>
+                    <span>RC Download Fee: <span class="text-white font-mono text-sm">₹99</span> Per Search</span>
                 </div>
 
-                <!-- TECHNICAL SPECS CARD -->
-                <div id="cardSpecs" class="hidden info-card rounded-xl p-4 space-y-3">
-                    <div class="flex items-center gap-2 pb-2 border-b border-slate-800 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        <i class="fa-solid fa-wrench text-blue-400"></i> Technical Specs
-                    </div>
-                    <div class="space-y-2.5" id="listSpecs"></div>
-                </div>
-
-                <!-- RC & COMPLIANCE CARD -->
-                <div id="cardRc" class="hidden info-card rounded-xl p-4 space-y-3">
-                    <div class="flex items-center gap-2 pb-2 border-b border-slate-800 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        <i class="fa-solid fa-file-shield text-blue-400"></i> RC & Compliance
-                    </div>
-                    <div class="space-y-2.5" id="listRc"></div>
-                </div>
-
-                <!-- ADDRESS DETAILS CARD -->
-                <div id="cardAddress" class="hidden info-card rounded-xl p-4 space-y-2 md:col-span-2">
-                    <div class="flex items-center gap-2 pb-2 border-b border-slate-800 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        <i class="fa-solid fa-location-dot text-blue-400"></i> Address Details
-                    </div>
-                    <p id="valAddress" class="text-xs font-semibold text-slate-200 leading-relaxed pt-1">--</p>
-                </div>
-
-                <!-- INSURANCE INFO CARD -->
-                <div id="cardInsurance" class="hidden info-card rounded-xl p-4 space-y-3">
-                    <div class="flex items-center gap-2 pb-2 border-b border-slate-800 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                        <i class="fa-solid fa-building-shield text-blue-400"></i> Insurance Info
-                    </div>
-                    <div class="space-y-2.5" id="listInsurance"></div>
-                </div>
-
+                <p class="text-slate-400 text-sm">Enter vehicle registration number to fetch and download original RC document instantly.</p>
             </div>
 
+            <!-- SEARCH FORM -->
+            <form id="rcForm" onsubmit="triggerHackerScan(event)" class="max-w-xl mx-auto space-y-4">
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <div class="relative flex-grow">
+                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-500">
+                            <i class="fa-solid fa-car"></i>
+                        </div>
+                        <input 
+                            type="text" 
+                            id="vehicleInput" 
+                            class="w-full pl-11 pr-4 py-4 bg-slate-950/90 border border-slate-700/80 rounded-2xl font-mono text-lg font-semibold tracking-wider text-white uppercase placeholder:normal-case placeholder:font-sans placeholder:text-slate-500 placeholder:text-base focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 transition-all shadow-inner" 
+                            placeholder="e.g. MH01AB1234, GJ05MS9717" 
+                            required
+                            autocomplete="off"
+                            oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')"
+                        >
+                    </div>
+                    <button 
+                        type="submit" 
+                        class="sm:w-auto w-full px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-2xl transition-all shadow-lg shadow-blue-600/30 flex items-center justify-center gap-2 whitespace-nowrap active:scale-[0.98]"
+                    >
+                        <span>Download RC (₹99)</span>
+                        <i class="fa-solid fa-download text-sm"></i>
+                    </button>
+                </div>
+            </form>
         </div>
 
     </main>
 
 
-    <!-- FOOTER -->
-    <footer class="w-full bg-[#1c2541]/80 border-t border-slate-800 py-4 px-6 text-xs text-slate-400 mt-8">
-        <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div id="footerBadges" class="flex flex-wrap gap-2 font-mono text-[11px]"></div>
-            <p>&copy; 2026 VahanVerify. All rights reserved.</p>
+    <!-- HACKER SCANNING FULLSCREEN OVERLAY -->
+    <div id="hackerOverlay" class="fixed inset-0 z-50 hidden matrix-bg flex flex-col items-center justify-center p-4">
+        <div class="relative w-full max-w-xl p-8 rounded-3xl bg-slate-950/90 border border-emerald-500/40 shadow-2xl overflow-hidden font-mono">
+            <!-- Scanning Laser Line -->
+            <div class="scanner-line"></div>
+
+            <div class="text-emerald-400 text-center space-y-4 relative z-10">
+                <div class="w-16 h-16 mx-auto bg-emerald-500/10 border border-emerald-500/30 rounded-2xl flex items-center justify-center text-emerald-400 text-2xl animate-pulse">
+                    <i class="fa-solid fa-terminal"></i>
+                </div>
+                <h3 class="text-xl font-bold tracking-widest text-emerald-300">BYPASSING RTO FIREWALL...</h3>
+                <div id="terminalLogs" class="text-xs text-slate-400 space-y-1 h-28 overflow-hidden text-left bg-black/60 p-3 rounded-xl border border-emerald-500/20">
+                    <p>> Initializing secure socket connection...</p>
+                    <p>> Deducting ₹99 download charge from wallet...</p>
+                    <p>> Resolving National Transport Registry node...</p>
+                </div>
+                <div class="w-full bg-slate-800 rounded-full h-2 overflow-hidden border border-emerald-500/30">
+                    <div id="scanProgressBar" class="bg-emerald-500 h-full w-0 transition-all duration-300"></div>
+                </div>
+                <p id="scanStatusText" class="text-xs text-emerald-500 font-semibold">Decrypting Vehicle Database records...</p>
+            </div>
         </div>
+    </div>
+
+
+    <!-- PREMIUM RC DOWNLOAD SERVER ERROR MODAL -->
+    <div id="errorModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="glass-modal w-full max-w-md p-8 rounded-3xl text-center relative overflow-hidden bg-slate-900 border border-red-500/30 shadow-2xl">
+            <div class="w-20 h-20 mx-auto bg-red-500/10 border border-red-500/30 rounded-3xl flex items-center justify-center text-red-500 text-3xl mb-4 shadow-lg shadow-red-500/10">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-red-400 mb-2">GATEWAY SERVER OFFLINE</h3>
+            <p class="text-slate-300 text-sm max-w-sm mx-auto leading-relaxed mb-6">
+                National Vahan API Gateway is currently under emergency maintenance or sync timeout. RC Book PDF generation failed. Please try again after 30 minutes.
+            </p>
+            <button onclick="closeErrorModal()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl border border-slate-700 transition-all">
+                Dismiss & Return
+            </button>
+        </div>
+    </div>
+
+
+    <!-- PAYMENT GATEWAY SERVER ERROR MODAL -->
+    <div id="paymentErrorModal" class="fixed inset-0 z-50 hidden flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
+        <div class="glass-modal w-full max-w-md p-8 rounded-3xl text-center relative overflow-hidden bg-slate-900 border border-red-500/30 shadow-2xl">
+            <div class="w-20 h-20 mx-auto bg-red-500/10 border border-red-500/30 rounded-3xl flex items-center justify-center text-red-500 text-3xl mb-4 shadow-lg shadow-red-500/10">
+                <i class="fa-solid fa-circle-exclamation"></i>
+            </div>
+            <h3 class="text-2xl font-bold text-red-400 mb-2">ADD MONEY SERVER ERROR</h3>
+            <p class="text-slate-300 text-sm max-w-sm mx-auto leading-relaxed mb-6">
+                Payment Gateway switch node is unreachable (Error Code: PG-503). Online wallet top-up is temporarily suspended for maintenance.
+            </p>
+            <button onclick="closePaymentErrorModal()" class="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-xl border border-slate-700 transition-all">
+                Close
+            </button>
+        </div>
+    </div>
+
+
+    <!-- FOOTER -->
+    <footer class="w-full border-t border-slate-800/80 bg-slate-950/80 backdrop-blur-md py-6 text-center text-xs text-slate-500">
+        <p>&copy; 2026 VahanVerify Pro. All rights reserved. Secure Gateway Mock Interface.</p>
     </footer>
 
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // Security Controls
-        document.addEventListener('contextmenu', e => e.preventDefault());
-        document.addEventListener('keydown', e => {
-            if (e.key === 'F12') e.preventDefault();
-            if (e.ctrlKey && e.shiftKey && ['I', 'i', 'J', 'j', 'C', 'c'].includes(e.key)) e.preventDefault();
-            if (e.ctrlKey && ['u', 'U', 's', 'S'].includes(e.key)) e.preventDefault();
-        });
-
-        let isCooldownActive = false;
-
-        // Auto-Resize iFrame Broadcast
-        function sendIframeHeight() {
-            if (window.parent) {
-                window.parent.postMessage({ type: 'resize', height: document.body.scrollHeight }, '*');
-            }
-        }
-        window.addEventListener('resize', sendIframeHeight);
-
-        // Strict Null & Invalid Values Filter
-        function isValid(val) {
-            if (val === null || val === undefined) return false;
-            const str = val.toString().trim().toLowerCase();
-            return str !== '' && str !== 'null' && str !== 'undefined' && str !== '0' && str !== 'na' && str !== 'n/a';
+        function triggerPaymentServerError() {
+            document.getElementById('paymentErrorModal').classList.remove('hidden');
         }
 
-        async function handleSearch() {
-            if (isCooldownActive) return;
+        function closePaymentErrorModal() {
+            document.getElementById('paymentErrorModal').classList.add('hidden');
+        }
 
-            if (document.activeElement) {
-                document.activeElement.blur();
-            }
+        function closeErrorModal() {
+            document.getElementById('errorModal').classList.add('hidden');
+        }
 
-            const vehicleInput = document.getElementById('vehicleInput');
-            const regNo = vehicleInput.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase().trim();
-            
+        function triggerHackerScan(event) {
+            event.preventDefault();
+            const regNo = document.getElementById('vehicleInput').value.trim();
             if (!regNo) return;
 
-            // Reset UI
-            document.getElementById('errorState').classList.add('hidden');
-            document.getElementById('resultContainer').classList.add('hidden');
-            document.getElementById('loadingState').classList.remove('hidden');
+            const overlay = document.getElementById('hackerOverlay');
+            const progressBar = document.getElementById('scanProgressBar');
+            const terminalLogs = document.getElementById('terminalLogs');
 
-            startCooldown(7);
+            overlay.classList.remove('hidden');
+            progressBar.style.width = '0%';
 
-            // 1. LocalStorage Cache Check (24-Hour Expiry)
-            const cacheKey = `veh_${regNo}`;
-            const cachedData = localStorage.getItem(cacheKey);
-            if (cachedData) {
-                try {
-                    const parsed = JSON.parse(cachedData);
-                    const now = new Date().getTime();
-                    // 24 Hours in milliseconds = 86400000
-                    if (now - parsed.timestamp < 86400000) {
-                        document.getElementById('loadingState').classList.add('hidden');
-                        renderVehicleData(parsed.data, regNo);
-                        return;
-                    } else {
-                        localStorage.removeItem(cacheKey); // Expired cache
-                    }
-                } catch (e) {
-                    localStorage.removeItem(cacheKey);
-                }
-            }
-
-            // 2. Multi-Layer Proxy Anti-Block System
-            const targetApi = `https://hideme.eu.org/lookup?api=mvahan&key=mk-4px4ohkcxybb&number=${encodeURIComponent(regNo)}`;
-            
-            const proxyLayers = [
-                targetApi, // Layer 1: Direct Request
-                `https://api.allorigins.win/raw?url=${encodeURIComponent(targetApi)}`, // Layer 2: Primary Proxy
-                `https://corsproxy.io/?${encodeURIComponent(targetApi)}` // Layer 3: Secondary Proxy
+            const logs = [
+                `> Target Vehicle: ${regNo} identified`,
+                `> Verifying Wallet Balance (₹450.00)...`,
+                `> Deducting ₹99 download fee...`,
+                `> Connecting to regional RTO server cluster...`,
+                `> Injecting session token auth bypass...`,
+                `> Fetching owner encryption keys...`,
+                `> Generating digital RC PDF wrapper...`,
+                `> ERROR: Gateway synchronization timeout!`
             ];
 
-            let data = null;
+            let progress = 0;
+            let logIndex = 0;
 
-            for (let i = 0; i < proxyLayers.length; i++) {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 25000); // 25-sec Timeout for Mobile networks
+            const interval = setInterval(() => {
+                progress += 20;
+                progressBar.style.width = progress + '%';
 
-                try {
-                    const response = await fetch(proxyLayers[i], {
-                        method: 'GET',
-                        signal: controller.signal
-                    });
-
-                    clearTimeout(timeoutId);
-
-                    if (response.ok) {
-                        const jsonResult = await response.json();
-                        if (jsonResult && (jsonResult.success === true || jsonResult.status === "success") && jsonResult.vehicle) {
-                            data = jsonResult;
-                            break; // Stop loop if valid data received
-                        }
-                    }
-                } catch (err) {
-                    clearTimeout(timeoutId);
-                    console.warn(`Proxy Layer ${i + 1} Failed, attempting next layer...`);
+                if (logIndex < logs.length) {
+                    terminalLogs.innerHTML += `<p>${logs[logIndex]}</p>`;
+                    terminalLogs.scrollTop = terminalLogs.scrollHeight;
+                    logIndex++;
                 }
-            }
 
-            document.getElementById('loadingState').classList.add('hidden');
-
-            if (data) {
-                // Save to 24-Hour LocalStorage Cache
-                localStorage.setItem(cacheKey, JSON.stringify({
-                    timestamp: new Date().getTime(),
-                    data: data
-                }));
-
-                renderVehicleData(data, regNo);
-                setTimeout(() => {
-                    document.getElementById('resultContainer').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                    sendIframeHeight();
-                }, 100);
-            } else {
-                showError("Details not found. Please check the vehicle number or try again after 15 seconds.");
-            }
-        }
-
-        function startCooldown(seconds) {
-            isCooldownActive = true;
-            const btn = document.getElementById('searchBtn');
-            const btnText = document.getElementById('btnText');
-            const btnIcon = document.getElementById('btnIcon');
-
-            btn.disabled = true;
-            btnIcon.className = "fa-solid fa-clock text-xs animate-spin";
-
-            let timeLeft = seconds;
-            btnText.textContent = `Wait ${timeLeft}s...`;
-
-            const timer = setInterval(() => {
-                timeLeft--;
-                if (timeLeft > 0) {
-                    btnText.textContent = `Wait ${timeLeft}s...`;
-                } else {
-                    clearInterval(timer);
-                    isCooldownActive = false;
-                    btn.disabled = false;
-                    btnText.textContent = "Search Vehicle";
-                    btnIcon.className = "fa-solid fa-magnifying-glass text-xs";
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        overlay.classList.add('hidden');
+                        document.getElementById('errorModal').classList.remove('hidden');
+                    }, 600);
                 }
-            }, 1000);
-        }
-
-        function showError(msg) {
-            document.getElementById('errorMessageText').textContent = msg;
-            document.getElementById('errorState').classList.remove('hidden');
-            setTimeout(() => {
-                document.getElementById('errorState').scrollIntoView({ behavior: 'smooth', block: 'start' });
-                sendIframeHeight();
-            }, 100);
-        }
-
-        function renderVehicleData(rootData, inputRegNo) {
-            const v = rootData.vehicle || {};
-
-            // Dynamic Vehicle Icon
-            const logoIcon = document.getElementById('vehicleLogoIcon');
-            const cat = (v.vehicle_category || v.body_type || v.vehicle_class || '').toLowerCase();
-            
-            if (cat.includes('scooter') || cat.includes('two') || cat.includes('2w') || cat.includes('bike')) {
-                logoIcon.className = "fa-solid fa-motorcycle";
-            } else if (cat.includes('three') || cat.includes('3w') || cat.includes('rickshaw')) {
-                logoIcon.className = "fa-solid fa-truck-pickup";
-            } else if (cat.includes('bus') || cat.includes('truck')) {
-                logoIcon.className = "fa-solid fa-bus";
-            } else {
-                logoIcon.className = "fa-solid fa-car-side";
-            }
-
-            document.getElementById('resRegNo').textContent = v.registration_no || rootData.reg_no || inputRegNo;
-            
-            const fullModel = [v.make, v.model, v.variant].filter(isValid).join(' ');
-            document.getElementById('resModel').textContent = fullModel || 'Vehicle Details';
-
-            const statusEl = document.getElementById('resStatus');
-            statusEl.textContent = isValid(v.status) ? v.status.toUpperCase() : 'ACTIVE';
-
-            const fuelEl = document.getElementById('resFuel');
-            if (isValid(v.fuel)) {
-                fuelEl.textContent = `Fuel: ${v.fuel.toUpperCase()}`;
-                fuelEl.classList.remove('hidden');
-            } else { fuelEl.classList.add('hidden'); }
-
-            const normsEl = document.getElementById('resNorms');
-            if (isValid(v.norms)) {
-                normsEl.textContent = `Norms: ${v.norms}`;
-                normsEl.classList.remove('hidden');
-            } else { normsEl.classList.add('hidden'); }
-
-            // Render Card Sections
-            renderCardList('cardOwner', 'listOwner', [
-                { label: 'Full Name', val: v.owner },
-                { label: 'Mobile Number', val: rootData.mobile, isMobile: true },
-                { label: 'Father\'s Name', val: v.father_name },
-                { label: 'City', val: v.city }
-            ]);
-
-            renderCardList('cardSpecs', 'listSpecs', [
-                { label: 'Chassis No', val: v.chassis },
-                { label: 'Chassis (Last 5)', val: rootData.chassis_last5 },
-                { label: 'Engine No', val: v.engine },
-                { label: 'Vehicle Class', val: v.vehicle_class },
-                { label: 'Body Type', val: v.body_type },
-                { label: 'Color', val: v.color },
-                { label: 'Cubic Capacity (CC)', val: v.cubic_capacity },
-                { label: 'Seating Capacity', val: v.seating_capacity }
-            ]);
-
-            renderCardList('cardRc', 'listRc', [
-                { label: 'Reg Authority (RTO)', val: v.rto },
-                { label: 'Registration Date', val: v.registration_date },
-                { label: 'RC Valid Upto', val: v.fit_upto },
-                { label: 'PUCC Expiry', val: v.puc_upto },
-                { label: 'Tax Valid Upto', val: v.tax_upto },
-                { label: 'Financier', val: v.financier }
-            ]);
-
-            const addrCard = document.getElementById('cardAddress');
-            if (isValid(v.address)) {
-                document.getElementById('valAddress').textContent = v.address;
-                addrCard.classList.remove('hidden');
-            } else {
-                addrCard.classList.add('hidden');
-            }
-
-            renderCardList('cardInsurance', 'listInsurance', [
-                { label: 'Insurer', val: v.insurance_company },
-                { label: 'Policy No', val: v.insurance_policy_no },
-                { label: 'Policy Expiry', val: v.insurance_upto }
-            ]);
-
-            // Footer Badges
-            const footerBadges = document.getElementById('footerBadges');
-            footerBadges.innerHTML = '';
-            const metaList = [
-                { label: 'Source', val: v.source },
-                { label: 'Key Expiry', val: rootData.key_expiry },
-                { label: 'Dev', val: rootData.developer },
-                { label: 'Credits', val: rootData.credits }
-            ];
-            metaList.forEach(m => {
-                if (isValid(m.val)) {
-                    footerBadges.innerHTML += `<span class="bg-slate-900 border border-slate-800 px-2 py-0.5 rounded text-slate-300">${m.label}: ${m.val}</span>`;
-                }
-            });
-
-            document.getElementById('resultContainer').classList.remove('hidden');
-            sendIframeHeight();
-        }
-
-        function renderCardList(cardId, listId, items) {
-            const card = document.getElementById(cardId);
-            const list = document.getElementById(listId);
-            list.innerHTML = '';
-
-            const validItems = items.filter(item => isValid(item.val));
-
-            if (validItems.length > 0) {
-                validItems.forEach(item => {
-                    const mobileClass = item.isMobile ? 'text-emerald-400 bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-500/30' : 'text-slate-100';
-                    list.innerHTML += `
-                        <div class="flex justify-between items-center text-xs gap-2">
-                            <span class="key-label">${item.label}</span>
-                            <span class="val-text font-mono ${mobileClass} text-right truncate">${item.val}</span>
-                        </div>
-                    `;
-                });
-                card.classList.remove('hidden');
-            } else {
-                card.classList.add('hidden');
-            }
+            }, 600);
         }
     </script>
 </body>
